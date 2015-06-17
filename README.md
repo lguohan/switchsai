@@ -5,17 +5,17 @@ The switchsai library exposes the standard Switch Abstraction Interface (SAI) AP
 
 Refer to https://github.com/p4lang/p4factory/tree/master/targets/switch for more details on switch.p4 program and https://github.com/p4lang/switchapi for details on switchapi library.
 
-    +-----+    +-----+   +-----+  +-----+
-    |App 1|    |App j|   |App n|  |App q|
-    |     |... |     |...|     |..|     | 
-    +-----+    +-----+   +-----+  +-----+
-       |        |          |  |     |
-    +-----------------------+ |     |
-    |          SAI          | |     |
-    |                       | |     |
-    +-----------------------+ |     |
-    |      Switch API       | |     |
-    |                       | |     |
+    +-----+     +-----+
+    |App 1|     |App n|
+    |     | ... |     | 
+    +-----+     +-----+
+       |          | | 
+       |          | +-----+
+    +-------------------+ |
+    |        SAI        | |
+    +-------------------+---+
+    |      SwitchAPI        |
+    |  (higher level API)   |
     +-----------------------+---------+
     |      Resource Mgmt. API         |
     | (auto-gen. from switch.p4)      |
@@ -31,6 +31,5 @@ Supported Features
 2. Basic L3 Routing: IPv4, IPv6 and VRF
 3. LAG
 4. ECMP
-5. Unicast RPF check
 
 For the list of supported APIs and attributes, please refer to sai_support.pdf file in the doc directory.
