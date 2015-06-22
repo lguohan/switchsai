@@ -5,24 +5,24 @@ The switchsai library exposes the standard Switch Abstraction Interface (SAI) AP
 
 Refer to https://github.com/p4lang/p4factory/tree/master/targets/switch for more details on switch.p4 program and https://github.com/p4lang/switchapi for details on switchapi library.
 
-    +-----+     +-----+
-    |App 1|     |App n|
-    |     | ... |     | 
-    +-----+     +-----+
-       |          | | 
-       |          | +-----+
-    +-------------------+ |
-    |        SAI        | |
-    +-------------------+---+
-    |      SwitchAPI        |
-    |  (higher level API)   |
-    +-----------------------+---------+
-    |      Resource Mgmt. API         |
-    | (auto-gen. from switch.p4)      |
-    +---------------------------------+
-    |        Soft Switch              |
-    |  (compiled from switch.p4)      |
-    +---------------------------------+ 
+    +-----+   +-----+   +-----+   +-----+
+    |App a|   |App j|   |App n|   |App z|
+    |     |...|     |...|     |...|     |
+    +-----+   +-----+   +-----+   +-----+
+       |         |         |         |
+       |         |         |         |
+    +---------------+      |         |
+    |      SAI      |      |         |
+    +--------------------------+     |
+    |      SwitchAPI           |     |
+    |  (higher level API)      |     |
+    +-----------------------------------+
+    |      Resource Mgmt. API           |
+    | (auto-gen. from switch.p4)        |
+    +-----------------------------------+
+    |        Soft Switch                |
+    |  (compiled from switch.p4)        |
+    +-----------------------------------+
 
 Supported Features
 ------------------
