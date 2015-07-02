@@ -57,7 +57,7 @@ sai_status_t sai_create_virtual_router_entry(
 sai_status_t sai_remove_virtual_router_entry(
         _In_ sai_object_id_t vr_id) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    status = switch_api_vrf_delete(vr_id);
+    status = switch_api_vrf_delete(device, vr_id);
     return (sai_status_t) status;
 }
 

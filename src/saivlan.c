@@ -53,7 +53,7 @@ sai_status_t sai_remove_vlan_entry(
     switch_handle_t vlan_handle = 0;
     status = switch_api_vlan_id_to_handle_get((switch_vlan_t) vlan_id,
                                                   &vlan_handle);
-    status = switch_api_vlan_delete(vlan_handle);
+    status = switch_api_vlan_delete(device, vlan_handle);
     return (sai_status_t) status;
 }
 
@@ -140,7 +140,7 @@ sai_status_t sai_add_ports_to_vlan(
         switch_port_list[index].handle = (switch_handle_t) port_list[index].port_id;
         switch_port_list[index].tagging_mode = (switch_vlan_tagging_mode_t) port_list[index].tagging_mode;
     }
-    status = switch_api_vlan_ports_add(vlan_handle, port_count, switch_port_list);
+    status = switch_api_vlan_ports_add(device, vlan_handle, port_count, switch_port_list);
     free(switch_port_list);
     return (sai_status_t) status;
 }
@@ -172,7 +172,7 @@ sai_status_t sai_remove_ports_from_vlan(
         switch_port_list[index].handle = (switch_handle_t) port_list[index].port_id;
         switch_port_list[index].tagging_mode = (switch_vlan_tagging_mode_t) port_list[index].tagging_mode;
     }
-    status = switch_api_vlan_ports_remove(vlan_handle, port_count, switch_port_list);
+    status = switch_api_vlan_ports_remove(device, vlan_handle, port_count, switch_port_list);
     free(switch_port_list);
     return (sai_status_t) status;
 }

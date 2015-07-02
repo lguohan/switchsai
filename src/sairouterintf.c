@@ -90,7 +90,7 @@ sai_status_t sai_create_router_interface(
 sai_status_t sai_remove_router_interface(
         _In_ sai_object_id_t rif_id) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    status = switch_api_interface_delete((switch_handle_t)rif_id);
+    status = switch_api_interface_delete(device, (switch_handle_t)rif_id);
     return (sai_status_t) status;
 }
 
