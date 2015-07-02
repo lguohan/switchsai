@@ -153,12 +153,10 @@ sai_status_t sai_add_next_hop_to_group(
         _In_ uint32_t next_hop_count,
         _In_ const sai_object_id_t* nexthops) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    int index = 0;
-    for (index = 0; index < next_hop_count; index++) {
-        status = switch_api_ecmp_member_add(device,
-                              (switch_handle_t) next_hop_group_id,
-                              (switch_handle_t) nexthops[index]);
-    }
+    status = switch_api_ecmp_member_add(device,
+                                  (switch_handle_t) next_hop_group_id,
+                                  next_hop_count,
+                                  (switch_handle_t *) nexthops);
     return (sai_status_t) status;
 }
 
@@ -180,12 +178,10 @@ sai_status_t sai_remove_next_hop_from_group(
         _In_ uint32_t next_hop_count,
         _In_ const sai_object_id_t* nexthops) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    int index = 0;
-    for (index = 0; index < next_hop_count; index++) {
-        status = switch_api_ecmp_member_delete(device,
-                              (switch_handle_t) next_hop_group_id,
-                              (switch_handle_t) nexthops[index]);
-    }
+    status = switch_api_ecmp_member_delete(device,
+                                  (switch_handle_t) next_hop_group_id,
+                                  next_hop_count,
+                                  (switch_handle_t *) nexthops);
     return (sai_status_t) status;
 }
 

@@ -64,7 +64,7 @@ sai_status_t sai_set_switch_attribute(
             memcpy(&api_switch_info.switch_mac, &attr->value.mac, 6);
             break;
     }
-    switch_api_capability_set(&api_switch_info);
+    switch_api_capability_set(device, &api_switch_info);
     return (sai_status_t) status;
 }
 
@@ -89,7 +89,7 @@ sai_status_t sai_get_switch_attribute(
     switch_api_capability_t api_switch_info;
     sai_attribute_t attribute;
 
-    switch_api_capability_get(&api_switch_info);
+    switch_api_capability_get(device, &api_switch_info);
     for (index1 = 0; index1 < attr_count; index1++) {
         attribute = attr_list[index1];
         switch (attribute.id) {

@@ -37,17 +37,19 @@ sai_status_t sai_create_stp_entry(
     const sai_vlan_list_t *vlans;
     sai_vlan_id_t vlan_id = 0;
     int index1 = 0, index2 = 0;
-    switch_handle_t vlan_handle;
+    switch_handle_t *vlan_handle;
     *stp_id = (sai_object_id_t) switch_api_stp_group_create(device, 0);
     for (index1 = 0; index1 < attr_count; index1++) {
         attribute = &attr_list[index1];
         if (attribute->id == SAI_STP_ATTR_VLAN) {
             vlans = &attribute->value.vlanlist;
+            vlan_handle = (switch_handle_t *) malloc(sizeof(switch_handle_t) * vlans->vlan_count);
             for (index2 = 0; index2 < vlans->vlan_count; index2++) {
                 vlan_id = vlans->vlan_list[index2];
-                switch_api_vlan_id_to_handle_get(vlan_id, &vlan_handle);
-                status = switch_api_stp_group_vlan_add(*stp_id, vlan_handle);
+                switch_api_vlan_id_to_handle_get(vlan_id, &vlan_handle[index2]);
             }
+            status = switch_api_stp_group_vlans_add(device, *stp_id, vlans->vlan_count, vlan_handle);
+            free(vlan_handle);
         }
     }
     return (sai_status_t) status;
@@ -63,7 +65,7 @@ sai_status_t sai_create_stp_entry(
 sai_status_t sai_remove_stp_entry(
         _In_ sai_object_id_t stp_id) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    status = switch_api_stp_group_delete((switch_handle_t)stp_id);
+    status = switch_api_stp_group_delete(device, (switch_handle_t)stp_id);
     return (sai_status_t) status;
 }
 

@@ -70,7 +70,7 @@ sai_status_t sai_create_lag_entry(
 sai_status_t sai_remove_lag_entry(
         _In_ sai_object_id_t lag_id) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    status = switch_api_lag_delete((switch_handle_t) lag_id);
+    status = switch_api_lag_delete(device, (switch_handle_t) lag_id);
     return (sai_status_t) status;
 }
 

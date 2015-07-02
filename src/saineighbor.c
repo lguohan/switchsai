@@ -24,12 +24,12 @@ static void sai_neighbor_entry_parse(
         switch_api_neighbor_t *api_neighbor) {
     api_neighbor->interface = (switch_handle_t) neighbor_entry->rif_id;
     if (neighbor_entry->ip_address.addr_family == SAI_IP_ADDR_FAMILY_IPV4) {
-        api_neighbor->neigh_type = SWITCH_API_NEIGHBOR_L3_IPV4_UNICAST;
+        api_neighbor->rw_type = SWITCH_API_NEIGHBOR_RW_TYPE_L3;
         api_neighbor->ip_addr.type = SWITCH_API_IP_ADDR_V4;
         api_neighbor->ip_addr.ip.v4addr = neighbor_entry->ip_address.addr.ip4;
         api_neighbor->ip_addr.prefix_len = 32;
     } else if (neighbor_entry->ip_address.addr_family == SAI_IP_ADDR_FAMILY_IPV6) {
-        api_neighbor->neigh_type = SWITCH_API_NEIGHBOR_L3_IPV6_UNICAST;
+        api_neighbor->rw_type = SWITCH_API_NEIGHBOR_RW_TYPE_L3;
         api_neighbor->ip_addr.type = SWITCH_API_IP_ADDR_V6;
         memcpy(api_neighbor->ip_addr.ip.v6addr, neighbor_entry->ip_address.addr.ip6, 16);
         api_neighbor->ip_addr.prefix_len = 128;
