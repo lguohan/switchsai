@@ -92,7 +92,7 @@ sai_status_t sai_create_neighbor_entry(
     sai_neighbor_entry_parse(neighbor_entry, &api_neighbor);
     sai_neighbor_entry_attribute_parse(attr_count, attr_list, &api_neighbor);
     sai_neighbor_entry_nexthop_get(&api_neighbor);
-    status = switch_api_neighbor_entry_add(device, &api_neighbor);
+    switch_api_neighbor_entry_add(device, &api_neighbor);
     return (sai_status_t) status;
 }
 
