@@ -19,12 +19,15 @@ limitations under the License.
 #include <switchapi/switch_vlan.h>
 #include <switchapi/switch_capability.h>
 
+sai_switch_notification_t sai_switch_notifications;
+
 sai_status_t sai_initialize_switch(
         _In_ sai_switch_profile_id_t profile_id,
         _In_reads_z_(SAI_MAX_HARDWARE_ID_LEN) char* switch_hardware_id,
         _In_reads_opt_z_(SAI_MAX_FIRMWARE_PATH_NAME_LEN) char* firmware_path_name,
         _In_ sai_switch_notification_t* switch_notifications) {
     sai_status_t status = SAI_STATUS_SUCCESS;
+    memcpy(&sai_switch_notifications, switch_notifications, sizeof(sai_switch_notification_t));
     return (sai_status_t) status;
 }
 
