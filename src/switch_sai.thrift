@@ -26,6 +26,7 @@ typedef string sai_thrift_ip4_t
 typedef string sai_thrift_ip6_t
 typedef byte sai_thrift_ip_addr_family_t
 typedef byte sai_thrift_port_stp_port_state_t
+typedef i32 sai_thrift_hostif_trap_id_t
 
 struct sai_thrift_fdb_entry_t {
     1: sai_thrift_mac_t mac_address;
@@ -156,4 +157,13 @@ service switch_sai_rpc {
     //switch API
     sai_thrift_attribute_list_t sai_thrift_get_switch_attribute();
     sai_thrift_status_t sai_thrift_set_switch_attribute(1: sai_thrift_attribute_t attribute);
+
+    //Trap API
+    sai_thrift_object_id_t sai_thrift_create_hostif(1: list<sai_thrift_attribute_t> thrift_attr_list);
+    sai_thrift_status_t sai_thrift_remove_hostif(1: sai_thrift_object_id_t hif_id);
+    sai_thrift_object_id_t sai_thrift_create_hostif_trap_group(1: list<sai_thrift_attribute_t> thrift_attr_list);
+    sai_thrift_status_t sai_thrift_remove_hostif_trap_group(1: sai_thrift_object_id_t hif_id);
+    sai_thrift_status_t sai_thrift_create_hostif_trap(1: list<sai_thrift_attribute_t> thrift_attr_list);
+    sai_thrift_status_t sai_thrift_remove_hostif_trap(1: sai_thrift_hostif_trap_id_t trap_id);
+    sai_thrift_status_t sai_thrift_set_hostif_trap(1: sai_thrift_hostif_trap_id_t trap_id, 2: sai_thrift_attribute_t thrift_attr);
 }

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "saiapi.h"
 #include "saiinternal.h"
+#include "switchapi/switch_handle.h"
 
 sai_api_service_t sai_api_service;
 switch_device_t device = 0;
@@ -28,7 +29,6 @@ sai_status_t sai_api_query(
         _In_ sai_api_t sai_api_id,
         _Out_ void ** api_method_table)
 {
-
     sai_status_t status =  SAI_STATUS_SUCCESS;
 
     switch (sai_api_id) {
@@ -106,6 +106,55 @@ sai_status_t sai_api_query(
     return status;
 }
 
+/*
+* Routine Description:
+*     Query sai object type.
+*
+* Arguments:
+*     [in] sai_object_id_t
+*
+* Return Values:
+*    Return SAI_OBJECT_TYPE_NULL when sai_object_id is not valid.
+*    Otherwise, return a valid sai object type SAI_OBJECT_TYPE_XXX
+*/
+sai_object_type_t 
+sai_object_type_query(
+    _In_ sai_object_id_t sai_object_id) {
+    sai_object_type_t object_type = SAI_OBJECT_TYPE_NULL;
+    switch_handle_type_t handle_type = SWITCH_HANDLE_TYPE_NONE;
+    handle_type = switch_handle_get_type(sai_object_id);
+    switch (handle_type) {
+        case SWITCH_HANDLE_TYPE_PORT:
+            object_type = SAI_OBJECT_TYPE_PORT;
+            break;
+        case SWITCH_HANDLE_TYPE_LAG:
+            object_type = SAI_OBJECT_TYPE_LAG;
+            break;
+        case SWITCH_HANDLE_TYPE_INTERFACE:
+            object_type = SAI_OBJECT_TYPE_ROUTER_INTERFACE;
+            break;
+        case SWITCH_HANDLE_TYPE_VRF:
+            object_type = SAI_OBJECT_TYPE_VIRTUAL_ROUTER;
+            break;
+        case SWITCH_HANDLE_TYPE_NHOP:
+            object_type = SAI_OBJECT_TYPE_NEXT_HOP;
+            break;
+        case SWITCH_HANDLE_TYPE_STP:
+            object_type = SAI_OBJECT_TYPE_STP_INSTANCE;
+            break;
+        case SWITCH_HANDLE_TYPE_ACL:
+            object_type = SAI_OBJECT_TYPE_ACL_TABLE;
+            break;
+        case SWITCH_HANDLE_TYPE_SUP_GROUP:
+            object_type = SAI_OBJECT_TYPE_TRAP_GROUP;
+            break;
+        default:
+            object_type = SAI_OBJECT_TYPE_NULL;
+            break;
+    }
+    return object_type;
+}
+
 sai_status_t sai_initialize() {
     sai_switch_initialize(&sai_api_service);
     sai_port_initialize(&sai_api_service);
@@ -119,6 +168,8 @@ sai_status_t sai_initialize() {
     sai_virtual_router_initialize(&sai_api_service);
     sai_stp_initialize(&sai_api_service);
     sai_neighbor_initialize(&sai_api_service);
+    sai_hostif_initialize(&sai_api_service);
+    sai_acl_initialize(&sai_api_service);
     return SAI_STATUS_SUCCESS;
 }
 

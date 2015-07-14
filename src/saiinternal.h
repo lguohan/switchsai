@@ -23,6 +23,7 @@ limitations under the License.
 #define __SAIINTERNAL_H_
 
 extern switch_device_t device;
+extern sai_switch_notification_t sai_switch_notifications;
 
 sai_status_t sai_switch_initialize(sai_api_service_t *sai_api_service);
 sai_status_t sai_port_initialize(sai_api_service_t *sai_api_service);
@@ -36,6 +37,8 @@ sai_status_t sai_route_initialize(sai_api_service_t *sai_api_service);
 sai_status_t sai_virtual_router_initialize(sai_api_service_t *sai_api_service);
 sai_status_t sai_stp_initialize(sai_api_service_t *sai_api_service);
 sai_status_t sai_neighbor_initialize(sai_api_service_t *sai_api_service);
+sai_status_t sai_hostif_initialize(sai_api_service_t *sai_api_service);
+sai_status_t sai_acl_initialize(sai_api_service_t *sai_api_service);
 
 unsigned int sai_v4_prefix_length(sai_ip4_t ip4);
 unsigned int sai_v6_prefix_length(const sai_ip6_t ip6);
