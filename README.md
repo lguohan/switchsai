@@ -31,7 +31,7 @@ Supported Features
 2. Basic L3 Routing: IPv4, IPv6 and VRF
 3. LAG
 4. ECMP
-5. Host interface
-6. ACL - IPv4 and MAC
+5. Basic ACL: MAC and IP ACLs
+6. Host interface
 
 For the list of supported APIs and attributes, please refer to sai_support.pdf file in the doc directory.
