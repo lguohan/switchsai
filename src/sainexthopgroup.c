@@ -57,7 +57,7 @@ sai_status_t sai_create_next_hop_group_entry(
     sai_attribute_t attribute;
     sai_object_id_t *nhop_list;
     uint32_t nhop_count = 0;
-    int index = 0;
+    uint32_t index = 0;
     *next_hop_group_id = (sai_object_id_t) switch_api_ecmp_create(device);
     for (index = 0; index < attr_count; index++) {
         attribute = attr_list[index];

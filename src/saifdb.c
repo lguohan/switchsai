@@ -32,7 +32,7 @@ static void sai_fdb_entry_attribute_parse(
         switch_api_mac_entry_t *mac_entry) {
 
     const sai_attribute_t *attribute;
-    int i = 0;
+    uint32_t i = 0;
     sai_packet_action_t action = 0;
 
     for (i = 0; i < attr_count; i++) {
@@ -191,7 +191,7 @@ sai_status_t sai_flush_fdb_entries(
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
     const sai_attribute_t *attribute;
-    int index = 0;
+    uint32_t index = 0;
     sai_object_id_t port_id = 0;
     sai_vlan_id_t vlan_id = 0;
     bool flush_all = false;
@@ -213,9 +213,9 @@ sai_status_t sai_flush_fdb_entries(
             case SAI_FDB_FLUSH_ATTR_ENTRY_TYPE:
                 entry_type = attribute->value.u8;
                 switch (entry_type) {
-                    case SAI_FDB_FLUSH_ENTRY_ALL:
-                        flush_all = true;
-                        break;
+//                    case SAI_FDB_FLUSH_ENTRY_ALL:
+//                        flush_all = true;
+//                        break;
                     case SAI_FDB_FLUSH_ENTRY_DYNAMIC:
                     case SAI_FDB_FLUSH_ENTRY_STATIC:
                         return SAI_STATUS_NOT_SUPPORTED;
@@ -224,16 +224,19 @@ sai_status_t sai_flush_fdb_entries(
         }
     }
     if (flush_all) {
-        status = switch_api_mac_table_entries_delete_all();
+        status = switch_api_mac_table_entries_delete_all(device);
     } else {
         if (port_valid && vlan_valid) {
             switch_api_vlan_id_to_handle_get(vlan_id, &vlan_handle);
-            status = switch_api_mac_table_entries_delete_by_interface_vlan((switch_handle_t)port_id, vlan_handle);
+            status = switch_api_mac_table_entries_delete_by_interface_vlan(
+                device, (switch_handle_t)port_id, vlan_handle);
         } else if (port_valid) {
-            status = switch_api_mac_table_entries_delete_by_interface((switch_handle_t)port_id);
+            status = switch_api_mac_table_entries_delete_by_interface(
+                device, (switch_handle_t)port_id);
         } else if (vlan_valid) {
             switch_api_vlan_id_to_handle_get(vlan_id, &vlan_handle);
-            status = switch_api_mac_table_entries_delete_by_vlan(vlan_handle);
+            status = switch_api_mac_table_entries_delete_by_vlan(device,
+                                                                 vlan_handle);
         } else {
             status = SAI_STATUS_FAILURE;
         }

@@ -39,8 +39,10 @@ sai_status_t sai_create_router_interface(
     switch_api_interface_info_t intf_info;
     const sai_attribute_t *attribute;
     sai_router_interface_type_t sai_intf_type;
-    int index = 0;
+    uint32_t index = 0;
     memset(&intf_info, 0, sizeof(switch_api_interface_info_t));
+    // default initialize
+    intf_info.ipv4_unicast_enabled = 1;
     for (index = 0; index < attr_count; index++) {
         attribute = &attr_list[index];
         switch (attribute->id) {
@@ -61,6 +63,8 @@ sai_status_t sai_create_router_interface(
                 intf_info.u.vlan_id = attribute->value.u16;
                 break;
             case SAI_ROUTER_INTERFACE_ATTR_SRC_MAC_ADDRESS:
+                intf_info.mac_valid = TRUE;
+                memcpy(&intf_info.mac, &attribute->value.mac, 6);
                 break;
             case SAI_ROUTER_INTERFACE_ATTR_ADMIN_V4_STATE:
                 intf_info.ipv4_unicast_enabled = attribute->value.booldata;

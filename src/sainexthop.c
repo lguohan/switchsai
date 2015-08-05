@@ -17,6 +17,7 @@ limitations under the License.
 #include <sainexthop.h>
 #include "saiinternal.h"
 #include <switchapi/switch_nhop.h>
+#include <arpa/inet.h>
 
 /*
 * Routine Description:
@@ -39,7 +40,7 @@ sai_status_t sai_create_next_hop_entry(
         _In_ const sai_attribute_t *attr_list) {
     const sai_attribute_t *attribute;
     sai_status_t status = SAI_STATUS_SUCCESS;
-    int index = 0;
+    uint32_t index = 0;
     const sai_ip_address_t *sai_ip_addr;
     switch_nhop_key_t nhop_key;
     memset(&nhop_key, 0, sizeof(switch_nhop_key_t));
@@ -52,7 +53,7 @@ sai_status_t sai_create_next_hop_entry(
                 sai_ip_addr = &attribute->value.ipaddr;
                 if (sai_ip_addr->addr_family == SAI_IP_ADDR_FAMILY_IPV4) {
                     nhop_key.ip_addr.type = SWITCH_API_IP_ADDR_V4;
-                    nhop_key.ip_addr.ip.v4addr = sai_ip_addr->addr.ip4;
+                    nhop_key.ip_addr.ip.v4addr = ntohl(sai_ip_addr->addr.ip4);
                     nhop_key.ip_addr_valid = 1;
                     nhop_key.ip_addr.prefix_len = 32;
                 } else if (sai_ip_addr->addr_family == SAI_IP_ADDR_FAMILY_IPV6) {

@@ -31,7 +31,7 @@ typedef struct _sai_api_service_t {
     sai_neighbor_api_t              neighbor_api;
     sai_next_hop_api_t              nhop_api;
     sai_next_hop_group_api_t        nhop_group_api;
-    sai_qos_api_t                   qos_api;
+    sai_qos_map_api_t               qos_api;
     sai_acl_api_t                   acl_api;
     sai_lag_api_t                   lag_api;
     sai_stp_api_t                   stp_api;

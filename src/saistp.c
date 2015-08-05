@@ -36,12 +36,12 @@ sai_status_t sai_create_stp_entry(
     const sai_attribute_t *attribute;
     const sai_vlan_list_t *vlans;
     sai_vlan_id_t vlan_id = 0;
-    int index1 = 0, index2 = 0;
+    uint32_t index1 = 0, index2 = 0;
     switch_handle_t *vlan_handle;
     *stp_id = (sai_object_id_t) switch_api_stp_group_create(device, 0);
     for (index1 = 0; index1 < attr_count; index1++) {
         attribute = &attr_list[index1];
-        if (attribute->id == SAI_STP_ATTR_VLAN) {
+        if (attribute->id == SAI_STP_ATTR_VLAN_LIST) {
             vlans = &attribute->value.vlanlist;
             vlan_handle = (switch_handle_t *) malloc(sizeof(switch_handle_t) * vlans->vlan_count);
             for (index2 = 0; index2 < vlans->vlan_count; index2++) {

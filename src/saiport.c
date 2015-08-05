@@ -34,6 +34,21 @@ sai_status_t sai_set_port_attribute(
         _In_ sai_object_id_t port_id, 
         _In_ const sai_attribute_t *attr) {
     sai_status_t status = SAI_STATUS_SUCCESS;
+    switch_handle_t vlan_handle = 0;
+    switch_vlan_port_t switch_port;
+    if(attr) {
+        switch(attr->id) {
+            case SAI_PORT_ATTR_DEFAULT_VLAN:
+                status = switch_api_vlan_id_to_handle_get((switch_vlan_t) attr->value.u16, &vlan_handle);
+                switch_port.handle = (switch_handle_t)port_id;
+                switch_port.tagging_mode = SWITCH_VLAN_PORT_UNTAGGED;
+                status = switch_api_vlan_ports_add(device, vlan_handle, 1, &switch_port);
+                break;
+            default:
+                // unsupported
+                break;
+        }
+    }
     return (sai_status_t) status;
 }
 

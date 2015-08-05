@@ -19,6 +19,7 @@ limitations under the License.
 #include "saiinternal.h"
 #include <switchapi/switch_handle.h>
 #include <switchapi/switch_acl.h>
+#include <arpa/inet.h>
 
 /*
 Note: SAI ACL action processing implementation changes in the future
@@ -34,7 +35,7 @@ static table_match_qualifiers ip_acl = {
         -1, -1,   // v6
         -1, -1, // MAC
         SWITCH_ACL_IP_FIELD_IPV4_SRC, SWITCH_ACL_IP_FIELD_IPV4_DEST, // v4
-        -1, -1, -1, -1, // ports
+        -2, -1, -2, -1, // ports
         -1, -1, -1, -1, -1, -1, // VLAN outer and inner
         SWITCH_ACL_IP_FIELD_L4_SOURCE_PORT, SWITCH_ACL_IP_FIELD_L4_DEST_PORT, // l4 ports
         SWITCH_ACL_IP_FIELD_ETH_TYPE,
@@ -55,7 +56,7 @@ static table_match_qualifiers ipv6_acl = {
         SWITCH_ACL_IPV6_FIELD_IPV6_SRC, SWITCH_ACL_IPV6_FIELD_IPV6_DEST,
         -1, -1, // MAC
         -1, -1, // v4
-        -1, -1, -1, -1, // ports
+        -2, -1, -2, -1, // ports
         -1, -1, -1, -1, -1, -1, // VLAN outer and inner
         SWITCH_ACL_IPV6_FIELD_L4_SOURCE_PORT, SWITCH_ACL_IPV6_FIELD_L4_DEST_PORT, // l4 ports
         SWITCH_ACL_IPV6_FIELD_ETH_TYPE,
@@ -76,7 +77,7 @@ static table_match_qualifiers mac_acl = {
         -1, -1,   // v6
         SWITCH_ACL_MAC_FIELD_SOURCE_MAC, SWITCH_ACL_MAC_FIELD_DEST_MAC, // MAC
         -1, -1, // v4
-        -1, -1, -1, -1, // ports
+        -2, -1, -2, -1, // ports
         -1, SWITCH_ACL_MAC_FIELD_VLAN_PRI, SWITCH_ACL_MAC_FIELD_VLAN_CFI, -1, -1, -1, // VLAN outer and inner
         -1, -1, // l4 ports
         SWITCH_ACL_MAC_FIELD_ETH_TYPE,
@@ -119,7 +120,7 @@ static int match_table_type(
     for(i=0;i<SWITCH_ACL_TYPE_MAX;i++) {
         int *table = get_p4_match_table(i);
         if(table) {
-            int j=0;
+            uint32_t j=0;
             for(j=0;j<attr_count;j++) {
                 // skip ports and VLAN attributes on check
                 switch(attr_list[j].id) {
@@ -146,16 +147,22 @@ static int match_table_type(
 static int match_table_field(int table_id, 
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list,
-        _Out_ int *match_fields) 
+        _Out_ int *match_fields,
+        _Out_ int *actions) 
 {
     int *table = get_p4_match_table(table_id);
     if(table) {
-        int j=0;
+        uint32_t j=0;
         for(j=0;j<attr_count;j++) {
-            if(table[attr_list[j].id - SAI_ACL_TABLE_ATTR_FIELD_START] != -1)
-                match_fields[j] = table[attr_list[j].id];
-            else
-                return -1;
+            int id = attr_list[j].id;
+            if(id >= SAI_ACL_TABLE_ATTR_FIELD_START && id <= SAI_ACL_TABLE_ATTR_FIELD_END) {
+                id -= SAI_ACL_TABLE_ATTR_FIELD_START;
+                if(table[id] != -1) {
+                    match_fields[j] = table[id];
+                }
+                else
+                    return -1;
+            }
         }
         return 0;
     }
@@ -170,12 +177,12 @@ static int xform_field_value(switch_acl_type_t acl_type, int field, void *dest, 
                 switch_acl_ip_key_value_pair_t *kvp = (switch_acl_ip_key_value_pair_t *)dest;
                 switch(field) {
                     case SWITCH_ACL_IP_FIELD_IPV4_SRC:
-                        kvp->value.ipv4_source = source->data.ip4;
-                        kvp->mask.u.mask = source->mask.ip4;
+                        kvp->value.ipv4_source = ntohl(source->data.ip4);
+                        kvp->mask.u.mask = ntohl(source->mask.ip4);
                         break;
                     case SWITCH_ACL_IP_FIELD_IPV4_DEST:
-                        kvp->value.ipv4_dest = source->data.ip4;
-                        kvp->mask.u.mask = source->mask.ip4;
+                        kvp->value.ipv4_dest = ntohl(source->data.ip4);
+                        kvp->mask.u.mask = ntohl(source->mask.ip4);
                         break;
                     case SWITCH_ACL_IP_FIELD_IP_PROTO:
                         kvp->value.ip_proto = source->data.u16;
@@ -347,7 +354,7 @@ sai_status_t sai_create_acl_entry(
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    int i=0;
+    uint32_t i=0;
     sai_object_id_t acl_table_id = 0ULL;
     int *match_fields = NULL;
     switch_acl_ip_key_value_pair_t *kvp=NULL;
@@ -368,18 +375,18 @@ sai_status_t sai_create_acl_entry(
         switch(attr_list[i].id) {
             // ACL table identifier
             case SAI_ACL_ENTRY_ATTR_TABLE_ID:
-                acl_table_id = attr_list[i].value.oid;
+                acl_table_id = attr_list[i].value.aclfield.data.oid;
                 break;
             // ACL entry priority
             case SAI_ACL_ENTRY_ATTR_PRIORITY:
-                priority = attr_list[i].value.u32;
+                priority = attr_list[i].value.aclfield.data.u32;
                 break;
             // ACL REFERENCE handling
             case SAI_ACL_ENTRY_ATTR_FIELD_IN_PORTS:
                 {
-                    int j=0;
-                    sai_object_id_t *obj = attr_list[i].value.objlist.list;
-                    for(j=0;i<attr_list[j].value.objlist.count;j++) {
+                    uint32_t j=0;
+                    sai_object_id_t *obj = attr_list[i].value.aclfield.data.objlist.list;
+                    for(j=0;j<attr_list[i].value.aclfield.data.objlist.count;j++) {
                         // accumulate handle mask
                         handle = malloc(sizeof(sai_handle_node_t));
                         if(handle) {
@@ -388,13 +395,14 @@ sai_status_t sai_create_acl_entry(
                             tommy_list_insert_head(&handle_list, &(handle->node), handle);
                         }
                     }
+                    free(attr_list[i].value.aclfield.data.objlist.list);
                 }
                 break;
             case SAI_ACL_ENTRY_ATTR_FIELD_IN_PORT:
                 handle = malloc(sizeof(sai_handle_node_t));
                 if(handle) {
                     memset(handle, 0, sizeof(sai_handle_node_t));
-                    handle->handle = (switch_handle_t)attr_list[i].value.oid;
+                    handle->handle = (switch_handle_t)attr_list[i].value.aclfield.data.oid;
                     tommy_list_insert_head(&handle_list, &(handle->node), handle);
                 }
                 break;
@@ -408,7 +416,7 @@ sai_status_t sai_create_acl_entry(
                 handle = malloc(sizeof(sai_handle_node_t));
                 if(handle) {
                     memset(handle, 0, sizeof(sai_handle_node_t));
-                    handle->handle = (switch_handle_t)attr_list[i].value.oid;
+                    handle->handle = (switch_handle_t)attr_list[i].value.aclfield.data.oid;
                     tommy_list_insert_head(&handle_list, &(handle->node), handle);
                 }
                 break;
@@ -418,7 +426,7 @@ sai_status_t sai_create_acl_entry(
             // ACTION handling
             case SAI_ACL_ENTRY_ATTR_ACTION_REDIRECT:
                 {
-                    switch_handle_t handle = (switch_handle_t)attr_list[i].value.oid;
+                    switch_handle_t handle = (switch_handle_t)attr_list[i].value.aclfield.data.oid;
                     /*
                     if(SAI_CPU_PORT(port_handle)) {
                         acl_action = SWITCH_ACL_ACTION_REDIRECT_TO_CPU;
@@ -453,45 +461,52 @@ sai_status_t sai_create_acl_entry(
     field_size = SWITCH_ACL_IP_FIELD_MAX;   
     match_fields=malloc(sizeof(int)*field_size);
     if(match_fields) {
+        int *actions = NULL;
         // init the array to unknown
         for(i=0;i<field_size;i++)
             match_fields[i] = -1;
+        actions = malloc(sizeof(int)*SWITCH_ACL_ACTION_MAX);
         // get the match fields
-        match_table_field(acl_type, attr_count, attr_list,
-            match_fields);
-        // allocate to store key-value pairs
-        kvp = malloc(sizeof(switch_acl_ip_key_value_pair_t)*field_size);
-        if(kvp) {
-            int j=0;
-            // Translate the ATTR to field values
-            for(i=0;i<field_size;i++) {
-                if(match_fields[i] != -1) {
-                    kvp[j].field = match_fields[i];
-                    xform_field_value(acl_type, match_fields[i], &kvp[i],
-                            &(attr_list[i].value.aclfield));
-                }
-            }
-            // add entry with kvp and j
-            if(j > 0) {
-                tommy_node *node;
-                // create the rule
-                switch_api_acl_rule_create(device, acl_table_id,
-                          priority, j, kvp, acl_action, &action_params, acl_entry_id);
-                // reference the ACL on handle
-                node = tommy_list_head(&handle_list);
-                while(node) {
-                    handle = node->data;
-                    if(handle) {
-                        switch_api_acl_reference(device, *acl_entry_id, handle->handle);
+        if(match_table_field(acl_type, attr_count, attr_list,
+                    match_fields, actions) != -1) {
+            // allocate to store key-value pairs
+            kvp = malloc(sizeof(switch_acl_ip_key_value_pair_t)*field_size);
+            if(kvp) {
+                int j=0;
+                // Translate the ATTR to field values
+                for(i=0;i<field_size;i++) {
+                    if(match_fields[i] != -1) {
+                        if(match_fields[i] >= 0) {
+                            kvp[j].field = match_fields[i];
+                            xform_field_value(acl_type, match_fields[i], &kvp[j],
+                                    &(attr_list[i].value.aclfield));
+                            j++;
+                        }
                     }
-                    node = node->next;
                 }
+                // add entry with kvp and j
+                if(j > 0) {
+                    tommy_node *node;
+                    // create the rule
+                    switch_api_acl_rule_create(device, acl_table_id,
+                            priority, j, kvp, acl_action, &action_params, acl_entry_id);
+                    // reference the ACL on handle
+                    node = tommy_list_head(&handle_list);
+                    while(node) {
+                        handle = node->data;
+                        if(handle) {
+                            switch_api_acl_reference(device, acl_table_id, handle->handle);
+                        }
+                        node = node->next;
+                    }
 
-                // free handle_list
-                tommy_list_foreach(&handle_list, free);
+                    // free handle_list
+                    tommy_list_foreach(&handle_list, free);
+                }
             }
+            free(kvp);
         }
-        free(kvp);
+        free(actions);
         free(match_fields);
     }
 
@@ -512,6 +527,7 @@ sai_status_t sai_create_acl_entry(
 sai_status_t sai_delete_acl_entry( 
         _In_ sai_object_id_t acl_entry_id) {
     sai_status_t status = SAI_STATUS_SUCCESS;
+    status = switch_api_acl_rule_delete(device, (switch_handle_t)0, (switch_handle_t)acl_entry_id);
     return (sai_status_t) status;
 }
 

@@ -27,6 +27,7 @@ typedef string sai_thrift_ip6_t
 typedef byte sai_thrift_ip_addr_family_t
 typedef byte sai_thrift_port_stp_port_state_t
 typedef i32 sai_thrift_hostif_trap_id_t
+typedef i32 sai_thrift_next_hop_type_t
 
 struct sai_thrift_fdb_entry_t {
     1: sai_thrift_mac_t mac_address;
@@ -64,6 +65,57 @@ struct sai_thrift_vlan_list_t {
     2: list<sai_thrift_vlan_id_t> vlan_list;
 }
 
+union sai_thrift_acl_mask_t {
+    1: byte u8;
+    2: byte s8;
+    3: i16 u16;
+    4: i16 s16;
+    5: i32 u32;
+    6: i32 s32;
+    7: sai_thrift_mac_t mac;
+    8: sai_thrift_ip4_t ip4;
+    9: sai_thrift_ip6_t ip6;
+}
+
+union sai_thrift_acl_data_t {
+    1: byte u8;
+    2: byte s8;
+    3: i16 u16;
+    4: i16 s16;
+    5: i32 u32;
+    6: i32 s32;
+    7: sai_thrift_mac_t mac;
+    8: sai_thrift_ip4_t ip4;
+    9: sai_thrift_ip6_t ip6;
+    10: sai_thrift_object_id_t oid;
+    11: sai_thrift_object_list_t objlist;
+}
+
+struct sai_thrift_acl_field_data_t
+{
+    1: bool enable;
+    2: sai_thrift_acl_mask_t mask;
+    3: sai_thrift_acl_data_t data;
+}
+
+union sai_thrift_acl_parameter_t {
+    1: byte u8;
+    2: byte s8;
+    3: i16 u16;
+    4: i16 s16;
+    5: i32 u32;
+    6: i32 s32;
+    7: sai_thrift_mac_t mac;
+    8: sai_thrift_ip4_t ip4;
+    9: sai_thrift_ip6_t ip6;
+    10: sai_thrift_object_id_t oid;
+}
+
+struct sai_thrift_acl_action_data_t {
+    1: bool enable;
+    2: sai_thrift_acl_parameter_t parameter;
+}
+
 union sai_thrift_attribute_value_t {
     1:  bool booldata;
     2:  string chardata;
@@ -82,6 +134,8 @@ union sai_thrift_attribute_value_t {
     15: sai_thrift_ip_address_t ipaddr;
     16: sai_thrift_object_list_t objlist;
     17: sai_thrift_vlan_list_t vlanlist;
+    18: sai_thrift_acl_field_data_t aclfield;
+    19: sai_thrift_acl_action_data_t aclaction;
 }
 
 struct sai_thrift_attribute_t {
@@ -101,7 +155,7 @@ struct sai_thrift_neighbor_entry_t {
 
 struct sai_thrift_attribute_list_t {
     1: list<sai_thrift_attribute_t> attr_list;
-    2: i32 attr_count;
+    2: i32 attr_count; // redundant
 }
 
 service switch_sai_rpc {
@@ -162,8 +216,16 @@ service switch_sai_rpc {
     sai_thrift_object_id_t sai_thrift_create_hostif(1: list<sai_thrift_attribute_t> thrift_attr_list);
     sai_thrift_status_t sai_thrift_remove_hostif(1: sai_thrift_object_id_t hif_id);
     sai_thrift_object_id_t sai_thrift_create_hostif_trap_group(1: list<sai_thrift_attribute_t> thrift_attr_list);
-    sai_thrift_status_t sai_thrift_remove_hostif_trap_group(1: sai_thrift_object_id_t hif_id);
+    sai_thrift_status_t sai_thrift_remove_hostif_trap_group(1: sai_thrift_object_id_t trap_group_id);
     sai_thrift_status_t sai_thrift_create_hostif_trap(1: list<sai_thrift_attribute_t> thrift_attr_list);
     sai_thrift_status_t sai_thrift_remove_hostif_trap(1: sai_thrift_hostif_trap_id_t trap_id);
     sai_thrift_status_t sai_thrift_set_hostif_trap(1: sai_thrift_hostif_trap_id_t trap_id, 2: sai_thrift_attribute_t thrift_attr);
+
+    // ACL API
+    sai_thrift_object_id_t sai_thrift_create_acl_table(1: list<sai_thrift_attribute_t> thrift_attr_list);
+    sai_thrift_status_t sai_thrift_delete_acl_table(1: sai_thrift_object_id_t acl_table_id);
+
+    sai_thrift_object_id_t sai_thrift_create_acl_entry(1: list<sai_thrift_attribute_t> thrift_attr_list);
+    sai_thrift_status_t sai_thrift_delete_acl_entry(1: sai_thrift_object_id_t acl_entry);
+
 }
