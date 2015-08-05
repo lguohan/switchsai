@@ -17,6 +17,8 @@ limitations under the License.
 #include <sairoute.h>
 #include "saiinternal.h"
 #include <switchapi/switch_l3.h>
+#include <switchapi/switch_hostif.h>
+#include <arpa/inet.h>
 
 unsigned int sai_v4_prefix_length(sai_ip4_t ip4)  {
     int x = 0;
@@ -58,9 +60,9 @@ static void sai_route_entry_parse(
     sai_ip_addr = &unicast_route_entry->destination;
     *vrf_handle = (switch_handle_t) unicast_route_entry->vr_id;
     if (sai_ip_addr->addr_family == SAI_IP_ADDR_FAMILY_IPV4) {
-        prefix_length = sai_v4_prefix_length(sai_ip_addr->mask.ip4);
+        prefix_length = sai_v4_prefix_length(ntohl(sai_ip_addr->mask.ip4));
         ip_addr->type = SWITCH_API_IP_ADDR_V4;
-        ip_addr->ip.v4addr = sai_ip_addr->addr.ip4;
+        ip_addr->ip.v4addr = ntohl(sai_ip_addr->addr.ip4);
         ip_addr->prefix_len = prefix_length;
     } else if (sai_ip_addr->addr_family == SAI_IP_ADDR_FAMILY_IPV6) {
         prefix_length = sai_v6_prefix_length(sai_ip_addr->mask.ip6);
@@ -73,9 +75,10 @@ static void sai_route_entry_parse(
 static void sai_route_entry_attribute_parse(
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list,
-        switch_handle_t *nhop_handle) {
+        switch_handle_t *nhop_handle,
+        int *action, int *pri) {
     const sai_attribute_t *attribute;
-    int index = 0;
+    uint32_t index = 0;
     for (index = 0; index < attr_count; index++) {
         attribute = &attr_list[index];
         switch (attribute->id) {
@@ -83,6 +86,10 @@ static void sai_route_entry_attribute_parse(
                 *nhop_handle = (switch_handle_t) attribute->value.oid;
                 break;
             case SAI_ROUTE_ATTR_TRAP_PRIORITY:
+                *pri = attribute->value.u8;
+                break;
+            case SAI_ROUTE_ATTR_PACKET_ACTION:
+                *action = attribute->value.s32;
                 break;
         }
     }
@@ -112,9 +119,27 @@ sai_status_t sai_create_route_entry(
     switch_ip_addr_t ip_addr;
     switch_handle_t nhop_handle = 0;
     switch_handle_t vrf_handle = 0;
+    int action=-1, pri=-1;
     sai_route_entry_parse(unicast_route_entry, &vrf_handle, &ip_addr);
-    sai_route_entry_attribute_parse(attr_count, attr_list, &nhop_handle);
-    status = switch_api_l3_route_add(device, vrf_handle, &ip_addr, nhop_handle);
+    sai_route_entry_attribute_parse(attr_count, attr_list, &nhop_handle, &action, &pri);
+    if(!nhop_handle && action != -1) {
+        switch(action) {
+            case SAI_PACKET_ACTION_DROP:
+                nhop_handle = switch_api_cpu_nhop_get(SWITCH_HOSTIF_REASON_CODE_NULL_DROP);
+                break;
+            case SAI_PACKET_ACTION_FORWARD:
+                break;
+            case SAI_PACKET_ACTION_TRAP:
+                // set the nhop_handle to the cpu nhop
+                nhop_handle = switch_api_cpu_nhop_get(SWITCH_HOSTIF_REASON_CODE_GLEAN);
+                break;
+            default:
+                break;
+        }
+    }
+    if (nhop_handle) {
+        status = switch_api_l3_route_add(device, vrf_handle, &ip_addr, nhop_handle);
+    }
     return (sai_status_t) status;
 }
 

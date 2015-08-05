@@ -18,6 +18,7 @@ limitations under the License.
 #include "saiinternal.h"
 #include <switchapi/switch_neighbor.h>
 #include <switchapi/switch_nhop.h>
+#include <arpa/inet.h>
 
 static void sai_neighbor_entry_parse(
         const sai_neighbor_entry_t *neighbor_entry,
@@ -26,7 +27,7 @@ static void sai_neighbor_entry_parse(
     if (neighbor_entry->ip_address.addr_family == SAI_IP_ADDR_FAMILY_IPV4) {
         api_neighbor->rw_type = SWITCH_API_NEIGHBOR_RW_TYPE_L3;
         api_neighbor->ip_addr.type = SWITCH_API_IP_ADDR_V4;
-        api_neighbor->ip_addr.ip.v4addr = neighbor_entry->ip_address.addr.ip4;
+        api_neighbor->ip_addr.ip.v4addr = ntohl(neighbor_entry->ip_address.addr.ip4);
         api_neighbor->ip_addr.prefix_len = 32;
     } else if (neighbor_entry->ip_address.addr_family == SAI_IP_ADDR_FAMILY_IPV6) {
         api_neighbor->rw_type = SWITCH_API_NEIGHBOR_RW_TYPE_L3;

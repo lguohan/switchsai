@@ -48,7 +48,7 @@ sai_status_t sai_create_lag_entry(
         _In_ sai_attribute_t *attr_list) {
     sai_status_t status = SAI_STATUS_SUCCESS;
     sai_attribute_t attribute;
-    int index = 0;
+    uint32_t index = 0;
     *lag_id = (sai_object_id_t) switch_api_lag_create(device);
     for (index = 0; index < attr_count; index++) {
         attribute = attr_list[index];
@@ -117,7 +117,7 @@ sai_status_t sai_add_ports_to_lag(
         _In_ const sai_object_list_t *port_list) {
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_direction_t direction = SWITCH_API_DIRECTION_BOTH;
-    int index = 0;
+    uint32_t index = 0;
     for (index = 0; index < port_list->count; index++) {
         status = switch_api_lag_member_add(device,
                         (switch_handle_t) lag_id,
@@ -140,7 +140,7 @@ sai_status_t sai_remove_ports_from_lag(
         _In_ const sai_object_list_t *port_list) {
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_direction_t direction = SWITCH_API_DIRECTION_BOTH;
-    int index = 0;
+    uint32_t index = 0;
     for (index = 0; index < port_list->count; index++) {
         status = switch_api_lag_member_delete(device,
                         (switch_handle_t) lag_id,

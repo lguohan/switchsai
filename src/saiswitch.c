@@ -46,6 +46,8 @@ sai_status_t sai_connect_switch(
 void sai_disconnect_switch(void) {
 }
 
+
+static int mac_set = 0;
 /*
 * Routine Description:
 *    Set switch attribute value
@@ -65,6 +67,7 @@ sai_status_t sai_set_switch_attribute(
     switch (attr->id) {
         case SAI_SWITCH_ATTR_SRC_MAC_ADDRESS:
             memcpy(&api_switch_info.switch_mac, &attr->value.mac, 6);
+            mac_set = 1;
             break;
     }
     switch_api_capability_set(device, &api_switch_info);
@@ -87,7 +90,7 @@ sai_status_t sai_get_switch_attribute(
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
     sai_status_t status = SAI_STATUS_SUCCESS;
-    int index1 = 0, index2 = 0;
+    uint32_t index1 = 0, index2 = 0;
     sai_object_list_t *objlist = NULL;
     switch_api_capability_t api_switch_info;
     sai_attribute_t attribute;
@@ -122,8 +125,12 @@ sai_status_t sai_get_switch_attribute(
                 break;
             case SAI_SWITCH_ATTR_SRC_MAC_ADDRESS:
                 memcpy(attribute.value.mac, &api_switch_info.switch_mac, 6);
+                if(!mac_set)
+                    return SAI_STATUS_FAILURE;
                 break;
-
+            case SAI_SWITCH_ATTR_CPU_PORT:
+                attr_list->value.oid = api_switch_info.port_list[64];
+                break;
         }
     }
     return (sai_status_t) status;

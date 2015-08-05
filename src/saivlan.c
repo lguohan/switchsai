@@ -133,7 +133,7 @@ sai_status_t sai_add_ports_to_vlan(
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_handle_t vlan_handle = 0;
     switch_vlan_port_t *switch_port_list;
-    int index = 0;
+    uint32_t index = 0;
     status = switch_api_vlan_id_to_handle_get((switch_vlan_t) vlan_id, &vlan_handle);
     switch_port_list = (switch_vlan_port_t *) malloc(sizeof(switch_vlan_port_t) * port_count);
     for (index = 0; index < port_count; index++) {
@@ -165,7 +165,7 @@ sai_status_t sai_remove_ports_from_vlan(
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_handle_t vlan_handle = 0;
     switch_vlan_port_t *switch_port_list;
-    int index = 0;
+    uint32_t index = 0;
     status = switch_api_vlan_id_to_handle_get((switch_vlan_t) vlan_id, &vlan_handle);
     switch_port_list = (switch_vlan_port_t *) malloc(sizeof(switch_vlan_port_t) * port_count);
     for (index = 0; index < port_count; index++) {

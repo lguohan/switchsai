@@ -17,6 +17,10 @@ limitations under the License.
 #include "saiapi.h"
 #include "saiinternal.h"
 #include "switchapi/switch_handle.h"
+#include "switchapi/switch_nhop.h"
+#include <p4_sim/rmt.h>
+#include <BMI/bmi_port.h>
+#include "sailog.h"
 
 sai_api_service_t sai_api_service;
 switch_device_t device = 0;
@@ -72,7 +76,7 @@ sai_status_t sai_api_query(
             *api_method_table = &sai_api_service.nhop_group_api;
             break;
 
-        case SAI_API_QOS:
+        case SAI_API_QOS_MAPS:
             *api_method_table = &sai_api_service.qos_api;
             break;
 
@@ -121,6 +125,7 @@ sai_object_type_t
 sai_object_type_query(
     _In_ sai_object_id_t sai_object_id) {
     sai_object_type_t object_type = SAI_OBJECT_TYPE_NULL;
+    switch_nhop_index_type_t nhop_type = 0;
     switch_handle_type_t handle_type = SWITCH_HANDLE_TYPE_NONE;
     handle_type = switch_handle_get_type(sai_object_id);
     switch (handle_type) {
@@ -137,7 +142,14 @@ sai_object_type_query(
             object_type = SAI_OBJECT_TYPE_VIRTUAL_ROUTER;
             break;
         case SWITCH_HANDLE_TYPE_NHOP:
-            object_type = SAI_OBJECT_TYPE_NEXT_HOP;
+            nhop_type = switch_api_nhop_type_get(sai_object_id);
+            if (nhop_type == SWITCH_NHOP_INDEX_TYPE_ONE_PATH) {
+                object_type = SAI_OBJECT_TYPE_NEXT_HOP;
+            } else if (nhop_type == SWITCH_NHOP_INDEX_TYPE_ECMP) {
+                object_type = SAI_OBJECT_TYPE_NEXT_HOP_GROUP;
+            } else {
+                object_type = SAI_OBJECT_TYPE_NULL;
+            }
             break;
         case SWITCH_HANDLE_TYPE_STP:
             object_type = SAI_OBJECT_TYPE_STP_INSTANCE;
@@ -145,7 +157,7 @@ sai_object_type_query(
         case SWITCH_HANDLE_TYPE_ACL:
             object_type = SAI_OBJECT_TYPE_ACL_TABLE;
             break;
-        case SWITCH_HANDLE_TYPE_SUP_GROUP:
+        case SWITCH_HANDLE_TYPE_HOSTIF_GROUP:
             object_type = SAI_OBJECT_TYPE_TRAP_GROUP;
             break;
         default:
@@ -171,6 +183,177 @@ sai_status_t sai_initialize() {
     sai_hostif_initialize(&sai_api_service);
     sai_acl_initialize(&sai_api_service);
     return SAI_STATUS_SUCCESS;
+}
+
+const char* sai_profile_get_value(_In_ sai_switch_profile_id_t profile_id,
+                                     _In_ const char* variable)
+{
+    return NULL;
+}
+
+
+    /* Enumerate all the K/V pairs in a profile. 
+       Pointer to NULL passed as variable restarts enumeration.
+       Function returns 0 if next value exists, -1 at the end of the list. */
+int sai_profile_get_next_value(_In_ sai_switch_profile_id_t profile_id,
+                                  _Out_ const char** variable,
+                                  _Out_ const char** value)
+{
+    return -1;
+}
+
+
+const service_method_table_t sai_services = {
+    .profile_get_value = sai_profile_get_value,
+    .profile_get_next_value = sai_profile_get_next_value
+};
+
+static unsigned int initialized = 0;
+extern int start_switch_api_packet_driver(void);
+static bmi_port_mgr_t *port_mgr;
+
+static void
+transmit_wrapper(p4_port_t egress, void *pkt, int len) {
+    if (bmi_port_send(port_mgr, egress, pkt, len) < 0) {
+        printf("Error sending packet\n");
+    }
+}
+
+
+static void
+packet_handler(int port_num, const char *buffer, int length)
+{
+    /* @fixme log vector */
+    printf("Packet in on port %d length %d; first bytes:\n", port_num, length);
+    int i = 0;
+    for (i = 0; i < 16; i++) {
+        if (i && ((i % 4) == 0)) {
+            printf(" ");
+        }
+        printf("%02x", (uint8_t) buffer[i]);
+    }
+    printf("\n");
+    printf("rmt proc returns %d\n", rmt_process_pkt(port_num, (char*)buffer, length));
+}
+
+static int load_config(char *fname)
+{
+    char s[256];
+    int port;
+    char veth[32];
+    char pcap[36];
+    FILE *fp = fopen(fname, "r");
+    if(fp) {
+        while(fgets(s, 256, fp)) {
+            pcap[0] = 0;
+            if(sscanf(s, "%d:%s %s", &port, veth, pcap) >= 2)
+                if(pcap[0] == 0) {
+                    strncpy(pcap, veth, 31);
+                    strcat(pcap, ".pcap");
+                }
+            if(bmi_port_interface_add(port_mgr, veth, port, pcap) != 0)
+                return -1;
+        }
+        fclose(fp);
+        return 0;
+    }
+    return -1;
+}
+
+static int api_log_level[SAI_API_SCHEDULER_GROUP+1];
+static const char *module[] = {
+    "UNSPECIFIED",
+    "SWITCH",
+    "PORT",
+    "FDB",
+    "VLAN",
+    "VIRTUAL_ROUTER",
+    "ROUTE",
+    "NEXT_HOP",
+    "NEXT_HOP_GROUP",
+    "ROUTER_INTERFACE",
+    "NEIGHBOR",
+    "ACL",
+    "HOST_INTERFACE",
+    "MIRROR",
+    "SAMPLEPACKET",
+    "STP",
+    "LAG",
+    "POLICER",
+    "WRED",
+    "QOS_MAPS",
+    "QUEUE",
+    "SCHEDULER",
+    "SCHEDULER_GROUP"
+  };
+
+sai_status_t
+sai_api_initialize(
+    _In_ uint64_t flags,
+    _In_ const service_method_table_t* services
+    )
+{
+    sai_status_t status =  SAI_STATUS_SUCCESS;
+    if(!initialized) {
+        SAI_LOG(SAI_LOG_WARN, SAI_API_UNSPECIFIED, "INIT device");
+        bmi_port_create_mgr(&port_mgr);
+        rmt_init();
+        rmt_logger_set((p4_logging_f) printf);
+        rmt_log_level_set(P4_LOG_LEVEL_TRACE);
+        rmt_transmit_register(transmit_wrapper);
+        status = load_config("port.cfg");
+        if(status != 0)
+            return status;
+        switch_api_init(0);
+        start_switch_api_packet_driver();
+        initialized = 1;
+        sai_initialize();
+        bmi_set_packet_handler(port_mgr, packet_handler);
+    }
+
+    services = &sai_services;
+    return status;
+}
+
+
+sai_status_t
+sai_api_uninitialize(
+    void
+    )
+{
+    sai_status_t status =  SAI_STATUS_SUCCESS;
+    return status;
+}
+
+
+sai_status_t sai_log_set(
+    _In_ sai_api_t sai_api_id,
+    _In_ sai_log_level_t log_level
+    )
+{
+    sai_status_t status =  SAI_STATUS_SUCCESS;
+    api_log_level[sai_api_id] = log_level;
+    return status;
+}
+
+#define MAX_LOG_BUFFER 1000
+
+char log_buf[MAX_LOG_BUFFER+1];
+
+void my_log(int level, sai_api_t api, char *fmt, ...)
+{
+    va_list args;
+    // compare if level of each API here?
+    if(level < api_log_level[api])
+        return;
+    va_start(args, fmt);
+    vsnprintf(log_buf, MAX_LOG_BUFFER, fmt, args);
+    va_end(args);
+#if 1
+    printf("%s: %s\n", module[api], log_buf);
+#else
+    syslog(LOG_DEBUG-level, "%s: %s", module[api], log_buf);
+#endif
 }
 
 #ifdef __cplusplus
