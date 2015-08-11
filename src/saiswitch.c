@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saivlan.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_vlan.h>
 #include <switchapi/switch_capability.h>
 
@@ -26,8 +27,14 @@ sai_status_t sai_initialize_switch(
         _In_reads_z_(SAI_MAX_HARDWARE_ID_LEN) char* switch_hardware_id,
         _In_reads_opt_z_(SAI_MAX_FIRMWARE_PATH_NAME_LEN) char* firmware_path_name,
         _In_ sai_switch_notification_t* switch_notifications) {
+
+    SAI_LOG_ENTER(SAI_API_SWITCH);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     memcpy(&sai_switch_notifications, switch_notifications, sizeof(sai_switch_notification_t));
+
+    SAI_LOG_EXIT(SAI_API_SWITCH);
+
     return (sai_status_t) status;
 }
 
@@ -39,7 +46,13 @@ sai_status_t sai_connect_switch(
         _In_ sai_switch_profile_id_t profile_id,
         _In_reads_z_(SAI_MAX_HARDWARE_ID_LEN) char* switch_hardware_id,
         _In_ sai_switch_notification_t* switch_notifications) {
+
+    SAI_LOG_ENTER(SAI_API_SWITCH);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_SWITCH);
+
     return (sai_status_t) status;
 }
 
@@ -61,6 +74,9 @@ static int mac_set = 0;
 */
 sai_status_t sai_set_switch_attribute(
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_SWITCH);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_api_capability_t api_switch_info;
 
@@ -71,6 +87,9 @@ sai_status_t sai_set_switch_attribute(
             break;
     }
     switch_api_capability_set(device, &api_switch_info);
+
+    SAI_LOG_EXIT(SAI_API_SWITCH);
+
     return (sai_status_t) status;
 }
 
@@ -89,6 +108,9 @@ sai_status_t sai_set_switch_attribute(
 sai_status_t sai_get_switch_attribute(
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_SWITCH);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     uint32_t index1 = 0, index2 = 0;
     sai_object_list_t *objlist = NULL;
@@ -133,6 +155,9 @@ sai_status_t sai_get_switch_attribute(
                 break;
         }
     }
+
+    SAI_LOG_EXIT(SAI_API_SWITCH);
+
     return (sai_status_t) status;
 }
 

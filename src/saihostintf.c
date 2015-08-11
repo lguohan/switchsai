@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saihostintf.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_hostif.h>
 
 /*
@@ -35,6 +36,9 @@ sai_status_t sai_create_hostif(
     _Out_ sai_object_id_t * hif_id,
     _In_ uint32_t attr_count,
     _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     const sai_attribute_t *attribute;
     uint32_t index = 0;
     switch_hostif_t hostif;
@@ -57,6 +61,9 @@ sai_status_t sai_create_hostif(
         }
     }
     *hif_id = switch_api_hostif_create(device, &hostif);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -73,8 +80,13 @@ sai_status_t sai_create_hostif(
 */
 sai_status_t sai_remove_hostif(
     _In_ sai_object_id_t hif_id) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_hostif_delete(device, hif_id);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
     return status;
 }
 
@@ -93,6 +105,11 @@ sai_status_t sai_remove_hostif(
 sai_status_t sai_set_hostif_attribute(
     _In_ sai_object_id_t hif_id,
     _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -113,6 +130,11 @@ sai_status_t sai_get_hostif_attribute(
     _In_ sai_object_id_t  hif_id,
     _In_ uint32_t attr_count,
     _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -133,6 +155,9 @@ sai_status_t sai_create_hostif_trap_group(
     _Out_ sai_object_id_t *hostif_trap_group_id,
     _In_ uint32_t attr_count,
     _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     const sai_attribute_t *attribute;
     switch_hostif_group_t hostif_group;
     uint32_t index = 0;
@@ -153,6 +178,9 @@ sai_status_t sai_create_hostif_trap_group(
         }
     }
     *hostif_trap_group_id = switch_api_hostif_group_create(device, &hostif_group);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -170,8 +198,14 @@ sai_status_t sai_create_hostif_trap_group(
 */
 sai_status_t sai_remove_hostif_trap_group(
     _In_ sai_object_id_t hostif_trap_group_id) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_hostif_group_delete(device, hostif_trap_group_id);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return status;
 }
 
@@ -190,6 +224,11 @@ sai_status_t sai_remove_hostif_trap_group(
 sai_status_t sai_set_hostif_trap_group_attribute(
     _In_ sai_object_id_t hostif_trap_group_id,
     _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -211,6 +250,11 @@ sai_status_t sai_get_hostif_trap_group_attribute(
     _In_ sai_object_id_t hostif_trap_group_id,
     _In_ uint32_t attr_count,
     _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -368,6 +412,9 @@ sai_status_t sai_create_hostif_trap(
     _In_ sai_hostif_trap_id_t hostif_trapid,
     _In_ uint32_t attr_count,
     _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     switch_api_hostif_rcode_info_t rcode_api_info;
     sai_status_t status = SAI_STATUS_SUCCESS;
     const sai_attribute_t *attribute;
@@ -394,6 +441,9 @@ sai_status_t sai_create_hostif_trap(
         }
     }
     status = switch_api_hostif_reason_code_create(device, &rcode_api_info);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return status;
 }
 
@@ -410,10 +460,16 @@ sai_status_t sai_create_hostif_trap(
 */
 sai_status_t sai_remove_hostif_trap(
     _In_ sai_hostif_trap_id_t hostif_trapid) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     switch_hostif_reason_code_t reason_code;
     sai_status_t status = SAI_STATUS_SUCCESS;
     reason_code = switch_sai_to_switch_api_reason_code(hostif_trapid);
     status = switch_api_hostif_reason_code_delete(device, reason_code);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return status;
 }
 
@@ -432,6 +488,9 @@ sai_status_t sai_remove_hostif_trap(
 sai_status_t sai_set_hostif_trap_attribute(
     _In_ sai_hostif_trap_id_t hostif_trapid,
     _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     switch_api_hostif_rcode_info_t rcode_api_info;
     sai_status_t status = SAI_STATUS_SUCCESS;
     memset(&rcode_api_info, 0, sizeof(switch_api_hostif_rcode_info_t));
@@ -453,6 +512,9 @@ sai_status_t sai_set_hostif_trap_attribute(
             break;
     }
     status = switch_api_hostif_reason_code_update(device, &rcode_api_info);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return status;
 }
 
@@ -473,6 +535,11 @@ sai_status_t sai_get_hostif_trap_attribute(
     _In_ sai_hostif_trap_id_t hostif_trapid,
     _In_ uint32_t attr_count,
     _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -491,6 +558,11 @@ sai_status_t sai_get_hostif_trap_attribute(
 sai_status_t sai_set_hostif_user_defined_trap_attribute(
     _In_ sai_hostif_user_defined_trap_id_t hostif_user_defined_trapid,
     _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -511,6 +583,11 @@ sai_status_t sai_get_hostif_user_defined_trap_attribute(
     _In_ sai_hostif_user_defined_trap_id_t hostif_user_defined_trapid,
     _In_ uint32_t attr_count,
     _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -540,6 +617,11 @@ sai_status_t sai_recv_hostif_packet(
     _Inout_ sai_size_t *buffer_size,
     _Inout_ uint32_t *attr_count,
     _Out_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return SAI_STATUS_SUCCESS;
 }
 
@@ -580,6 +662,9 @@ sai_status_t sai_send_hostif_packet(
     _In_ sai_size_t buffer_size,
     _In_ uint32_t attr_count,
     _In_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     switch_hostif_packet_t hostif_packet;
     sai_status_t status = SAI_STATUS_SUCCESS;
     memset(&hostif_packet, 0, sizeof(switch_hostif_packet_t));
@@ -602,6 +687,9 @@ sai_status_t sai_send_hostif_packet(
         }
     }
     status = switch_api_hostif_tx_packet(device, &hostif_packet);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return status;
 }
 
@@ -619,6 +707,9 @@ sai_status_t sai_send_hostif_packet(
 */
 void sai_recv_hostif_packet_cb(
     switch_hostif_packet_t *hostif_packet) {
+
+    SAI_LOG_ENTER(SAI_API_HOST_INTERFACE);
+
     int max_attr_count = 2;
     int attr_count = 0;
     sai_attribute_t attr_list[max_attr_count];
@@ -636,6 +727,9 @@ void sai_recv_hostif_packet_cb(
                                              hostif_packet->pkt_size,
                                              attr_count,
                                              attr_list);
+
+    SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
+
     return;
 }
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <sairoute.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_l3.h>
 #include <switchapi/switch_hostif.h>
 #include <arpa/inet.h>
@@ -115,6 +116,9 @@ sai_status_t sai_create_route_entry(
         _In_ const sai_unicast_route_entry_t* unicast_route_entry,
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_ip_addr_t ip_addr;
     switch_handle_t nhop_handle = 0;
@@ -140,6 +144,9 @@ sai_status_t sai_create_route_entry(
     if (nhop_handle) {
         status = switch_api_l3_route_add(device, vrf_handle, &ip_addr, nhop_handle);
     }
+
+    SAI_LOG_EXIT(SAI_API_ROUTE);
+
     return (sai_status_t) status;
 }
 
@@ -158,12 +165,18 @@ sai_status_t sai_create_route_entry(
 */
 sai_status_t sai_remove_route_entry(
         _In_ const sai_unicast_route_entry_t* unicast_route_entry) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_ip_addr_t ip_addr;
     switch_handle_t vrf_handle = 0;
     switch_handle_t nhop_handle = 0;
     sai_route_entry_parse(unicast_route_entry, &vrf_handle, &ip_addr);
     status = switch_api_l3_route_delete(device, vrf_handle, &ip_addr, nhop_handle);
+
+    SAI_LOG_EXIT(SAI_API_ROUTE);
+
     return (sai_status_t) status;
 }
 
@@ -182,7 +195,13 @@ sai_status_t sai_remove_route_entry(
 sai_status_t sai_set_route_entry_attribute(
         _In_ const sai_unicast_route_entry_t* unicast_route_entry,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_ROUTE);
+
     return (sai_status_t) status;
 }
 
@@ -203,7 +222,13 @@ sai_status_t sai_get_route_entry_attribute(
         _In_ const sai_unicast_route_entry_t* unicast_route_entry,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_ROUTE);
+
     return (sai_status_t) status;
 }
 

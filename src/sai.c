@@ -236,23 +236,32 @@ packet_handler(int port_num, const char *buffer, int length)
     printf("rmt proc returns %d\n", rmt_process_pkt(port_num, (char*)buffer, length));
 }
 
-static int load_config(char *fname)
+static int load_config(char *fname, unsigned int *num_ports)
 {
     char s[256];
     int port;
     char veth[32];
     char pcap[36];
+    char tmp[32];
+    char *pcap_file = NULL;
     FILE *fp = fopen(fname, "r");
     if(fp) {
         while(fgets(s, 256, fp)) {
+            int r=0;
             pcap[0] = 0;
-            if(sscanf(s, "%d:%s %s", &port, veth, pcap) >= 2)
-                if(pcap[0] == 0) {
-                    strncpy(pcap, veth, 31);
-                    strcat(pcap, ".pcap");
+            pcap_file = NULL;
+            if(!strncmp(s, "num_ports", 9)) {
+                sscanf(s, "%s = %d", tmp, num_ports);
+            }
+            else {
+                if((r= sscanf(s, "%d:%s %s", &port, veth, pcap)) >= 2) {
+                    pcap_file = pcap;
                 }
-            if(bmi_port_interface_add(port_mgr, veth, port, pcap) != 0)
-                return -1;
+                if(bmi_port_interface_add(port_mgr, veth, port, pcap_file) != 0) {
+                    fclose(fp);
+                    return -1;
+                }
+            }
         }
         fclose(fp);
         return 0;
@@ -290,10 +299,9 @@ static const char *module[] = {
 sai_status_t
 sai_api_initialize(
     _In_ uint64_t flags,
-    _In_ const service_method_table_t* services
-    )
-{
+    _In_ const service_method_table_t* services) {
     sai_status_t status =  SAI_STATUS_SUCCESS;
+    unsigned int num_ports = 32;
     if(!initialized) {
         SAI_LOG(SAI_LOG_WARN, SAI_API_UNSPECIFIED, "INIT device");
         bmi_port_create_mgr(&port_mgr);
@@ -301,10 +309,10 @@ sai_api_initialize(
         rmt_logger_set((p4_logging_f) printf);
         rmt_log_level_set(P4_LOG_LEVEL_TRACE);
         rmt_transmit_register(transmit_wrapper);
-        status = load_config("port.cfg");
+        status = load_config("port.cfg", &num_ports);
         if(status != 0)
             return status;
-        switch_api_init(0);
+        switch_api_init(0, num_ports);
         start_switch_api_packet_driver();
         initialized = 1;
         sai_initialize();
@@ -317,10 +325,7 @@ sai_api_initialize(
 
 
 sai_status_t
-sai_api_uninitialize(
-    void
-    )
-{
+sai_api_uninitialize(void) {
     sai_status_t status =  SAI_STATUS_SUCCESS;
     return status;
 }
@@ -328,9 +333,7 @@ sai_api_uninitialize(
 
 sai_status_t sai_log_set(
     _In_ sai_api_t sai_api_id,
-    _In_ sai_log_level_t log_level
-    )
-{
+    _In_ sai_log_level_t log_level) {
     sai_status_t status =  SAI_STATUS_SUCCESS;
     api_log_level[sai_api_id] = log_level;
     return status;
