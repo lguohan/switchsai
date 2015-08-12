@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saiacl.h>
 #include "saiapi.h"
+#include "sailog.h"
 #include "saiinternal.h"
 #include <switchapi/switch_handle.h>
 #include <switchapi/switch_acl.h>
@@ -302,14 +303,19 @@ static int xform_field_value(switch_acl_type_t acl_type, int field, void *dest, 
 sai_status_t sai_create_acl_table(
         _Out_ sai_object_id_t* acl_table_id,
         _In_ uint32_t attr_count,
-        _In_ const sai_attribute_t *attr_list)
-{
+        _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_ACL);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_acl_type_t acl_type = 0;
     acl_type = match_table_type( attr_count, attr_list);
     if(acl_type < 0) 
         return SAI_STATUS_INVALID_PARAMETER;
     *acl_table_id = (sai_object_id_t)switch_api_acl_list_create(device, acl_type);
+
+    SAI_LOG_EXIT(SAI_API_ACL);
+
     return (sai_status_t) status;
 }
 
@@ -326,8 +332,14 @@ sai_status_t sai_create_acl_table(
 */
 sai_status_t sai_delete_acl_table(
         _In_ sai_object_id_t acl_table_id) {
+
+    SAI_LOG_ENTER(SAI_API_ACL);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_acl_list_delete(device, (switch_handle_t) acl_table_id);
+
+    SAI_LOG_EXIT(SAI_API_ACL);
+
     return (sai_status_t) status;
 }
 
@@ -353,6 +365,9 @@ sai_status_t sai_create_acl_entry(
         _Out_ sai_object_id_t *acl_entry_id,
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_ACL);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     uint32_t i=0;
     sai_object_id_t acl_table_id = 0ULL;
@@ -510,6 +525,8 @@ sai_status_t sai_create_acl_entry(
         free(match_fields);
     }
 
+    SAI_LOG_EXIT(SAI_API_ACL);
+
     return (sai_status_t) status;
 }
 
@@ -526,8 +543,14 @@ sai_status_t sai_create_acl_entry(
 */
 sai_status_t sai_delete_acl_entry( 
         _In_ sai_object_id_t acl_entry_id) {
+
+    SAI_LOG_ENTER(SAI_API_ACL);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_acl_rule_delete(device, (switch_handle_t)0, (switch_handle_t)acl_entry_id);
+
+    SAI_LOG_EXIT(SAI_API_ACL);
+
     return (sai_status_t) status;
 }
 

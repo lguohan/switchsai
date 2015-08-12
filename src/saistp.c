@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saistp.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_stp.h>
 #include <switchapi/switch_vlan.h>
 
@@ -32,6 +33,9 @@ sai_status_t sai_create_stp_entry(
         _Out_ sai_object_id_t *stp_id,
         _In_  uint32_t attr_count,
         _In_  const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_STP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     const sai_attribute_t *attribute;
     const sai_vlan_list_t *vlans;
@@ -52,6 +56,9 @@ sai_status_t sai_create_stp_entry(
             free(vlan_handle);
         }
     }
+
+    SAI_LOG_EXIT(SAI_API_STP);
+
     return (sai_status_t) status;
 }
 
@@ -64,8 +71,14 @@ sai_status_t sai_create_stp_entry(
  */
 sai_status_t sai_remove_stp_entry(
         _In_ sai_object_id_t stp_id) {
+
+    SAI_LOG_ENTER(SAI_API_STP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_stp_group_delete(device, (switch_handle_t)stp_id);
+
+    SAI_LOG_EXIT(SAI_API_STP);
+
     return (sai_status_t) status;
 }
 
@@ -81,7 +94,13 @@ sai_status_t sai_remove_stp_entry(
 sai_status_t sai_set_stp_entry_attribute(
         _In_ sai_object_id_t stp_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_STP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_STP);
+
     return (sai_status_t) status;
 }
 
@@ -98,6 +117,11 @@ sai_status_t sai_get_stp_entry_attribute(
         _In_ sai_object_id_t stp_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_STP);
+
+    SAI_LOG_EXIT(SAI_API_STP);
+
     return 0;
 }
 
@@ -113,6 +137,9 @@ sai_status_t sai_set_stp_port_state(
         _In_ sai_object_id_t stp_id,
         _In_ sai_object_id_t port_id,   
         _In_ sai_port_stp_port_state_t stp_port_state) {
+
+    SAI_LOG_ENTER(SAI_API_STP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_stp_state_t switch_stp_state = SWITCH_PORT_STP_STATE_NONE;
     switch (stp_port_state) {
@@ -129,6 +156,9 @@ sai_status_t sai_set_stp_port_state(
     status = switch_api_stp_port_state_set(device, stp_id,
                                            port_id,
                                            switch_stp_state);
+
+    SAI_LOG_EXIT(SAI_API_STP);
+
     return (sai_status_t) status;
 }
 
@@ -145,6 +175,9 @@ sai_status_t sai_get_stp_port_state(
         _In_ sai_object_id_t stp_id,
         _In_ sai_object_id_t port_id,   
         _Out_ sai_port_stp_port_state_t *stp_port_state) {
+
+    SAI_LOG_ENTER(SAI_API_STP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_stp_state_t switch_stp_state = SWITCH_PORT_STP_STATE_NONE;
     status = switch_api_stp_port_state_get(device, stp_id, port_id, &switch_stp_state);
@@ -161,6 +194,9 @@ sai_status_t sai_get_stp_port_state(
         default:
             *stp_port_state = 0;
     }
+
+    SAI_LOG_EXIT(SAI_API_STP);
+
     return (sai_status_t) status;
 }
 

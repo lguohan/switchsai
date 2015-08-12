@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saifdb.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_l2.h>
 #include <switchapi/switch_vlan.h>
 
@@ -91,7 +92,9 @@ sai_status_t sai_create_fdb_entry(
 
     switch_api_mac_entry_t mac_entry;
     sai_status_t status = SAI_STATUS_SUCCESS;
-    
+
+    SAI_LOG_ENTER(SAI_API_FDB);
+
     if (!fdb_entry) {
         return SAI_STATUS_INVALID_PARAMETER;
     }
@@ -103,6 +106,9 @@ sai_status_t sai_create_fdb_entry(
     sai_fdb_entry_parse(fdb_entry, &mac_entry);
     sai_fdb_entry_attribute_parse(attr_count, attr_list, &mac_entry);
     status = switch_api_mac_table_entry_add(device, &mac_entry);
+
+    SAI_LOG_EXIT(SAI_API_FDB);
+
     return (sai_status_t) status;
 }
 
@@ -122,11 +128,16 @@ sai_status_t sai_remove_fdb_entry(
     switch_api_mac_entry_t mac_entry;
     sai_status_t status = SAI_STATUS_SUCCESS;
     
+    SAI_LOG_ENTER(SAI_API_FDB);
+
     if (!fdb_entry) {
         return SAI_STATUS_INVALID_PARAMETER;
     }
     sai_fdb_entry_parse(fdb_entry, &mac_entry);
     status = switch_api_mac_table_entry_delete(device, &mac_entry);
+
+    SAI_LOG_EXIT(SAI_API_FDB);
+
     return (sai_status_t) status;
 }
 
@@ -148,10 +159,15 @@ sai_status_t sai_set_fdb_entry_attribute(
     switch_api_mac_entry_t mac_entry;
     sai_status_t status = SAI_STATUS_SUCCESS;
     
+    SAI_LOG_ENTER(SAI_API_FDB);
+
     if (!fdb_entry) {
         return SAI_STATUS_INVALID_PARAMETER;
     }
     sai_fdb_entry_parse(fdb_entry, &mac_entry);
+
+    SAI_LOG_EXIT(SAI_API_FDB);
+
     return (sai_status_t) status;
 }
 
@@ -172,6 +188,8 @@ sai_status_t sai_get_fdb_entry_attribute(
         _In_ const sai_fdb_entry_t *fdb_entry,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+    SAI_LOG_ENTER(SAI_API_FDB);
+    SAI_LOG_EXIT(SAI_API_FDB);
     return 0;
 }
 
@@ -190,6 +208,9 @@ sai_status_t sai_get_fdb_entry_attribute(
 sai_status_t sai_flush_fdb_entries(
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_FDB);
+
     const sai_attribute_t *attribute;
     uint32_t index = 0;
     sai_object_id_t port_id = 0;
@@ -241,6 +262,9 @@ sai_status_t sai_flush_fdb_entries(
             status = SAI_STATUS_FAILURE;
         }
     }
+
+    SAI_LOG_EXIT(SAI_API_FDB);
+
     return status;
 }
 

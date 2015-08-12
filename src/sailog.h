@@ -31,6 +31,11 @@ void my_log(int level, sai_api_t api, char *fmt, ...);
                     __FILE__, __LINE__, __func__, ##arg); \
             } while(0);
 
+#define SAI_LOG_ENTER(api)              \
+    SAI_LOG(SAI_LOG_DEBUG, api, "Entering %s\n", __FUNCTION__)
+
+#define SAI_LOG_EXIT(api)               \
+    SAI_LOG(SAI_LOG_DEBUG, api, "Exiting %s\n", __FUNCTION__)
 
 #endif // _SAI_LOG_H
 

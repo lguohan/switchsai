@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <sainexthop.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_nhop.h>
 
 sai_status_t sai_create_next_hop_group_entry(
@@ -53,6 +54,9 @@ sai_status_t sai_create_next_hop_group_entry(
         _Out_ sai_object_id_t* next_hop_group_id,
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP_GROUP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     sai_attribute_t attribute;
     sai_object_id_t *nhop_list;
@@ -74,6 +78,9 @@ sai_status_t sai_create_next_hop_group_entry(
                 break;
         }
     }
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP_GROUP);
+
     return (sai_status_t) status;
 }
 
@@ -90,8 +97,14 @@ sai_status_t sai_create_next_hop_group_entry(
 */
 sai_status_t sai_remove_next_hop_group_entry(
         _In_ sai_object_id_t next_hop_group_id) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP_GROUP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_ecmp_delete(device, (switch_handle_t) next_hop_group_id);
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP_GROUP);
+
     return (sai_status_t) status;
 }
 
@@ -110,7 +123,13 @@ sai_status_t sai_remove_next_hop_group_entry(
 sai_status_t sai_set_next_hop_group_entry_attribute(
         _In_ sai_object_id_t next_hop_group_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP_GROUP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP_GROUP);
+
     return (sai_status_t) status;
 }
 
@@ -131,7 +150,13 @@ sai_status_t sai_get_next_hop_group_entry_attribute(
         _In_ sai_object_id_t next_hop_group_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP_GROUP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP_GROUP);
+
     return (sai_status_t) status;
 }
 

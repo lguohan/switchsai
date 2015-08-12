@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <sairouter.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_vrf.h>
 
 /*
@@ -37,9 +38,14 @@ sai_status_t sai_create_virtual_router_entry(
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
 
+    SAI_LOG_ENTER(SAI_API_VIRTUAL_ROUTER);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_vrf_id_t vrf_id = 1;
     *vr_id = (sai_object_id_t) switch_api_vrf_create(device, vrf_id);
+
+    SAI_LOG_EXIT(SAI_API_VIRTUAL_ROUTER);
+
     return (sai_status_t) status;
 }
 
@@ -56,8 +62,13 @@ sai_status_t sai_create_virtual_router_entry(
 */
 sai_status_t sai_remove_virtual_router_entry(
         _In_ sai_object_id_t vr_id) {
+
+    SAI_LOG_ENTER(SAI_API_VIRTUAL_ROUTER);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_vrf_delete(device, vr_id);
+
+    SAI_LOG_EXIT(SAI_API_VIRTUAL_ROUTER);
     return (sai_status_t) status;
 }
 
@@ -76,7 +87,13 @@ sai_status_t sai_remove_virtual_router_entry(
 sai_status_t sai_set_virtual_router_entry_attribute(
         _In_ sai_object_id_t vr_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_VIRTUAL_ROUTER);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_VIRTUAL_ROUTER);
+
     return (sai_status_t) status;
 }
 
@@ -97,7 +114,13 @@ sai_status_t sai_get_virtual_router_entry_attribute(
         _In_ sai_object_id_t vr_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_VIRTUAL_ROUTER);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_VIRTUAL_ROUTER);
+
     return (sai_status_t) status;
 }
 

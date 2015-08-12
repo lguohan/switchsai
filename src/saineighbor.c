@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saineighbor.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_neighbor.h>
 #include <switchapi/switch_nhop.h>
 #include <arpa/inet.h>
@@ -86,6 +87,9 @@ sai_status_t sai_create_neighbor_entry(
         _In_ const sai_neighbor_entry_t* neighbor_entry,
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_NEIGHBOR);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_api_neighbor_t api_neighbor;
 
@@ -94,6 +98,9 @@ sai_status_t sai_create_neighbor_entry(
     sai_neighbor_entry_attribute_parse(attr_count, attr_list, &api_neighbor);
     sai_neighbor_entry_nexthop_get(&api_neighbor);
     switch_api_neighbor_entry_add(device, &api_neighbor);
+
+    SAI_LOG_EXIT(SAI_API_NEIGHBOR);
+
     return (sai_status_t) status;
 }
 
@@ -112,6 +119,9 @@ sai_status_t sai_create_neighbor_entry(
 */
 sai_status_t sai_remove_neighbor_entry(
         _In_ const sai_neighbor_entry_t* neighbor_entry) {
+
+    SAI_LOG_ENTER(SAI_API_NEIGHBOR);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_api_neighbor_t api_neighbor;
     switch_handle_t neighbor_handle;
@@ -120,6 +130,9 @@ sai_status_t sai_remove_neighbor_entry(
     sai_neighbor_entry_nexthop_get(&api_neighbor);
     neighbor_handle = switch_api_neighbor_handle_get(api_neighbor.nhop_handle);
     status = switch_api_neighbor_entry_remove(device, neighbor_handle);
+
+    SAI_LOG_EXIT(SAI_API_NEIGHBOR);
+
     return (sai_status_t) status;
 }
 
@@ -138,7 +151,13 @@ sai_status_t sai_remove_neighbor_entry(
 sai_status_t sai_set_neighbor_entry_attribute(
         _In_ const sai_neighbor_entry_t* neighbor_entry,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_NEIGHBOR);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_NEIGHBOR);
+
     return (sai_status_t) status;
 }
 
@@ -159,7 +178,13 @@ sai_status_t sai_get_neighbor_entry_attribute(
         _In_ const sai_neighbor_entry_t* neighbor_entry,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_NEIGHBOR);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_NEIGHBOR);
+
     return (sai_status_t) status;
 }
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <sairouterintf.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_interface.h>
 
 /*
@@ -35,6 +36,9 @@ sai_status_t sai_create_router_interface(
         _Out_ sai_object_id_t* rif_id,
         _In_ uint32_t attr_count,
         _In_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTER_INTERFACE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_api_interface_info_t intf_info;
     const sai_attribute_t *attribute;
@@ -77,6 +81,9 @@ sai_status_t sai_create_router_interface(
         }
     }
     *rif_id = (sai_object_id_t) switch_api_interface_create(device, &intf_info);
+
+    SAI_LOG_EXIT(SAI_API_ROUTER_INTERFACE);
+
     return (sai_status_t) status;
 }
 
@@ -93,8 +100,14 @@ sai_status_t sai_create_router_interface(
 */
 sai_status_t sai_remove_router_interface(
         _In_ sai_object_id_t rif_id) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTER_INTERFACE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_interface_delete(device, (switch_handle_t)rif_id);
+
+    SAI_LOG_EXIT(SAI_API_ROUTER_INTERFACE);
+
     return (sai_status_t) status;
 }
 
@@ -113,7 +126,13 @@ sai_status_t sai_remove_router_interface(
 sai_status_t sai_set_router_interface_attribute(
         _In_ sai_object_id_t rif_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTER_INTERFACE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_ROUTER_INTERFACE);
+
     return (sai_status_t) status;
 }
 
@@ -134,7 +153,13 @@ sai_status_t sai_get_router_interface_attribute(
         _In_ sai_object_id_t rif_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_ROUTER_INTERFACE);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_ROUTER_INTERFACE);
+
     return (sai_status_t) status;
 }
 

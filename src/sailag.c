@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <sailag.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_lag.h>
 
 sai_status_t sai_create_lag_entry(
@@ -46,6 +47,9 @@ sai_status_t sai_create_lag_entry(
         _Out_ sai_object_id_t* lag_id,
         _In_ uint32_t attr_count,
         _In_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_LAG);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     sai_attribute_t attribute;
     uint32_t index = 0;
@@ -58,6 +62,9 @@ sai_status_t sai_create_lag_entry(
                 break;
         }
     }
+
+    SAI_LOG_EXIT(SAI_API_LAG);
+
     return (sai_status_t) status;
 }
 
@@ -69,8 +76,14 @@ sai_status_t sai_create_lag_entry(
 */
 sai_status_t sai_remove_lag_entry(
         _In_ sai_object_id_t lag_id) {
+
+    SAI_LOG_ENTER(SAI_API_LAG);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_lag_delete(device, (switch_handle_t) lag_id);
+
+    SAI_LOG_EXIT(SAI_API_LAG);
+
     return (sai_status_t) status;
 }
 
@@ -84,7 +97,13 @@ sai_status_t sai_remove_lag_entry(
 sai_status_t sai_set_lag_entry_attribute(
         _In_ sai_object_id_t lag_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_LAG);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_LAG);
+
     return (sai_status_t) status;
 }
 
@@ -100,7 +119,13 @@ sai_status_t sai_get_lag_entry_attribute(
         _In_ sai_object_id_t lag_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_LAG);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_LAG);
+
     return (sai_status_t) status;
 }
 
@@ -115,6 +140,9 @@ sai_status_t sai_get_lag_entry_attribute(
 sai_status_t sai_add_ports_to_lag(
         _In_ sai_object_id_t lag_id,
         _In_ const sai_object_list_t *port_list) {
+
+    SAI_LOG_ENTER(SAI_API_LAG);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_direction_t direction = SWITCH_API_DIRECTION_BOTH;
     uint32_t index = 0;
@@ -124,6 +152,9 @@ sai_status_t sai_add_ports_to_lag(
                         direction,
                         port_list->list[index]);
     }
+
+    SAI_LOG_EXIT(SAI_API_LAG);
+
     return (sai_status_t) status;
 }
 
@@ -138,6 +169,9 @@ sai_status_t sai_add_ports_to_lag(
 sai_status_t sai_remove_ports_from_lag(
         _In_ sai_object_id_t lag_id,
         _In_ const sai_object_list_t *port_list) {
+
+    SAI_LOG_ENTER(SAI_API_LAG);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_direction_t direction = SWITCH_API_DIRECTION_BOTH;
     uint32_t index = 0;
@@ -147,6 +181,9 @@ sai_status_t sai_remove_ports_from_lag(
                         direction,
                         port_list->list[index]);
     }
+
+    SAI_LOG_EXIT(SAI_API_LAG);
+
     return (sai_status_t) status;
 }
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saiport.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_port.h>
 
 /*
@@ -33,6 +34,9 @@ limitations under the License.
 sai_status_t sai_set_port_attribute(
         _In_ sai_object_id_t port_id, 
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_PORT);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_handle_t vlan_handle = 0;
     switch_vlan_port_t switch_port;
@@ -49,6 +53,9 @@ sai_status_t sai_set_port_attribute(
                 break;
         }
     }
+
+    SAI_LOG_EXIT(SAI_API_PORT);
+
     return (sai_status_t) status;
 }
 
@@ -69,7 +76,13 @@ sai_status_t sai_get_port_attribute(
         _In_ sai_object_id_t port_id, 
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_PORT);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_PORT);
+
     return (sai_status_t) status;
 }
 
@@ -92,7 +105,13 @@ sai_status_t sai_get_port_stats(
         _In_ const sai_port_stat_counter_t *counter_ids,
         _In_ uint32_t number_of_counters,
         _Out_ uint64_t* counters) {
+
+    SAI_LOG_ENTER(SAI_API_PORT);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_PORT);
+
     return (sai_status_t) status;
 }
 

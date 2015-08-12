@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <sainexthop.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_nhop.h>
 #include <arpa/inet.h>
 
@@ -38,6 +39,9 @@ sai_status_t sai_create_next_hop_entry(
         _Out_ sai_object_id_t* next_hop_id,
         _In_ uint32_t attr_count,
         _In_ const sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP);
+
     const sai_attribute_t *attribute;
     sai_status_t status = SAI_STATUS_SUCCESS;
     uint32_t index = 0;
@@ -71,6 +75,9 @@ sai_status_t sai_create_next_hop_entry(
         }
     }
     *next_hop_id = (sai_object_id_t) switch_api_nhop_create(device, &nhop_key);
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP);
+
     return (sai_status_t) status;
 }
 
@@ -87,8 +94,14 @@ sai_status_t sai_create_next_hop_entry(
 */
 sai_status_t sai_remove_next_hop_entry(
         _In_ sai_object_id_t next_hop_id) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     status = switch_api_nhop_delete(device, (switch_handle_t) next_hop_id);
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP);
+
     return (sai_status_t) status;
 }
 
@@ -107,7 +120,13 @@ sai_status_t sai_remove_next_hop_entry(
 sai_status_t sai_set_next_hop_entry_attribute(
         _In_ sai_object_id_t next_hop_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP);
+
     return (sai_status_t) status;
 }
 
@@ -128,7 +147,13 @@ sai_status_t sai_get_next_hop_entry_attribute(
         _In_ sai_object_id_t next_hop_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_NEXT_HOP);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_NEXT_HOP);
+
     return (sai_status_t) status;
 }
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <saivlan.h>
 #include "saiinternal.h"
+#include "sailog.h"
 #include <switchapi/switch_vlan.h>
 
 /*
@@ -31,8 +32,14 @@ limitations under the License.
 */
 sai_status_t sai_create_vlan_entry(
         _In_ sai_vlan_id_t vlan_id) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_api_vlan_create(device, (switch_vlan_t) vlan_id);
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -49,11 +56,17 @@ sai_status_t sai_create_vlan_entry(
 */
 sai_status_t sai_remove_vlan_entry(
         _In_ sai_vlan_id_t vlan_id) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_handle_t vlan_handle = 0;
     status = switch_api_vlan_id_to_handle_get((switch_vlan_t) vlan_id,
                                                   &vlan_handle);
     status = switch_api_vlan_delete(device, vlan_handle);
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -72,7 +85,13 @@ sai_status_t sai_remove_vlan_entry(
 sai_status_t sai_set_vlan_entry_attribute(
         _In_ sai_vlan_id_t vlan_id,
         _In_ const sai_attribute_t *attr) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -93,7 +112,13 @@ sai_status_t sai_get_vlan_entry_attribute(
         _In_ sai_vlan_id_t vlan_id,
         _In_ uint32_t attr_count,
         _Inout_ sai_attribute_t *attr_list) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -109,7 +134,13 @@ sai_status_t sai_get_vlan_entry_attribute(
 *    Failure status code on error
 */
 sai_status_t sai_remove_all_vlans(void) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -130,6 +161,9 @@ sai_status_t sai_add_ports_to_vlan(
         _In_ sai_vlan_id_t vlan_id,
         _In_ uint32_t port_count,
         _In_ const sai_vlan_port_t* port_list) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_handle_t vlan_handle = 0;
     switch_vlan_port_t *switch_port_list;
@@ -142,6 +176,9 @@ sai_status_t sai_add_ports_to_vlan(
     }
     status = switch_api_vlan_ports_add(device, vlan_handle, port_count, switch_port_list);
     free(switch_port_list);
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -162,6 +199,9 @@ sai_status_t sai_remove_ports_from_vlan(
         _In_ sai_vlan_id_t vlan_id,
         _In_ uint32_t port_count,
         _In_ const sai_vlan_port_t* port_list) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
     switch_handle_t vlan_handle = 0;
     switch_vlan_port_t *switch_port_list;
@@ -174,6 +214,9 @@ sai_status_t sai_remove_ports_from_vlan(
     }
     status = switch_api_vlan_ports_remove(device, vlan_handle, port_count, switch_port_list);
     free(switch_port_list);
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
@@ -196,7 +239,13 @@ sai_status_t sai_get_vlan_stats(
         _In_ const sai_vlan_stat_counter_t *counter_ids,
         _In_ uint32_t number_of_counters,
         _Out_ uint64_t* counters) {
+
+    SAI_LOG_ENTER(SAI_API_VLAN);
+
     sai_status_t status = SAI_STATUS_SUCCESS;
+
+    SAI_LOG_EXIT(SAI_API_VLAN);
+
     return (sai_status_t) status;
 }
 
