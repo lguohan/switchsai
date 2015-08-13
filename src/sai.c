@@ -223,6 +223,7 @@ transmit_wrapper(p4_port_t egress, void *pkt, int len) {
 static void
 packet_handler(int port_num, const char *buffer, int length)
 {
+#if 0
     /* @fixme log vector */
     printf("Packet in on port %d length %d; first bytes:\n", port_num, length);
     int i = 0;
@@ -234,9 +235,12 @@ packet_handler(int port_num, const char *buffer, int length)
     }
     printf("\n");
     printf("rmt proc returns %d\n", rmt_process_pkt(port_num, (char*)buffer, length));
+#else
+    rmt_process_pkt(port_num, (char*)buffer, length);
+#endif
 }
 
-static int load_config(char *fname, unsigned int *num_ports)
+static int load_config(char *fname, unsigned int *num_ports, int *log_level)
 {
     char s[256];
     int port;
@@ -250,8 +254,13 @@ static int load_config(char *fname, unsigned int *num_ports)
             int r=0;
             pcap[0] = 0;
             pcap_file = NULL;
+            if(s[0] == '#')
+                continue;
             if(!strncmp(s, "num_ports", 9)) {
                 sscanf(s, "%s = %d", tmp, num_ports);
+            }
+            else if(!strncmp(s, "log_level", 9)) {
+                sscanf(s, "%s = %d", tmp, log_level);
             }
             else {
                 if((r= sscanf(s, "%d:%s %s", &port, veth, pcap)) >= 2) {
@@ -302,16 +311,17 @@ sai_api_initialize(
     _In_ const service_method_table_t* services) {
     sai_status_t status =  SAI_STATUS_SUCCESS;
     unsigned int num_ports = 32;
+    int log_level = P4_LOG_LEVEL_TRACE;
     if(!initialized) {
         SAI_LOG(SAI_LOG_WARN, SAI_API_UNSPECIFIED, "INIT device");
         bmi_port_create_mgr(&port_mgr);
         rmt_init();
         rmt_logger_set((p4_logging_f) printf);
-        rmt_log_level_set(P4_LOG_LEVEL_TRACE);
-        rmt_transmit_register(transmit_wrapper);
-        status = load_config("port.cfg", &num_ports);
+        status = load_config("port.cfg", &num_ports, &log_level);
         if(status != 0)
             return status;
+        rmt_log_level_set(log_level);
+        rmt_transmit_register(transmit_wrapper);
         switch_api_init(0, num_ports);
         start_switch_api_packet_driver();
         initialized = 1;
