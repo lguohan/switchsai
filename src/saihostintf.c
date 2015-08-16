@@ -421,6 +421,7 @@ sai_status_t sai_create_hostif_trap(
     uint32_t index = 0;
     memset(&rcode_api_info, 0, sizeof(switch_api_hostif_rcode_info_t));
     rcode_api_info.reason_code = switch_sai_to_switch_api_reason_code(hostif_trapid);
+    rcode_api_info.channel     = SWITCH_HOSTIF_CHANNEL_NETDEV;
     for (index = 0; index < attr_count; index++) {
         attribute = &attr_list[index];
         switch (attribute->id) {
@@ -495,6 +496,7 @@ sai_status_t sai_set_hostif_trap_attribute(
     sai_status_t status = SAI_STATUS_SUCCESS;
     memset(&rcode_api_info, 0, sizeof(switch_api_hostif_rcode_info_t));
     rcode_api_info.reason_code = switch_sai_to_switch_api_reason_code(hostif_trapid);
+    rcode_api_info.channel     = SWITCH_HOSTIF_CHANNEL_NETDEV;
     switch (attr->id) {
         case SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION:
             rcode_api_info.action = switch_sai_action_to_switch_api_action(attr->value.u32);

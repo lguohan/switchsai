@@ -227,7 +227,7 @@ packet_handler(int port_num, const char *buffer, int length)
     /* @fixme log vector */
     printf("Packet in on port %d length %d; first bytes:\n", port_num, length);
     int i = 0;
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < 40; i++) {
         if (i && ((i % 4) == 0)) {
             printf(" ");
         }
@@ -311,7 +311,7 @@ sai_api_initialize(
     _In_ const service_method_table_t* services) {
     sai_status_t status =  SAI_STATUS_SUCCESS;
     unsigned int num_ports = 32;
-    int log_level = P4_LOG_LEVEL_TRACE;
+    int log_level = P4_LOG_LEVEL_NONE;
     if(!initialized) {
         SAI_LOG(SAI_LOG_WARN, SAI_API_UNSPECIFIED, "INIT device");
         bmi_port_create_mgr(&port_mgr);
