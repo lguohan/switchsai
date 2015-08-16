@@ -131,8 +131,8 @@ sai_status_t sai_get_switch_attribute(
                     objlist->list[index2] = api_switch_info.port_list[index2];
                 }
                 break;
-            case SAI_SWITCH_ATTR_DEFAULT_PORT_VLAN_ID:
-                break;
+//            case SAI_SWITCH_ATTR_DEFAULT_PORT_VLAN_ID:
+//                break;
             case SAI_SWITCH_ATTR_LAG_HASH_ALGO:
             case SAI_SWITCH_ATTR_LAG_HASH_SEED:
             case SAI_SWITCH_ATTR_LAG_HASH_FIELDS:

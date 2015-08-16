@@ -42,6 +42,7 @@ sai_status_t sai_set_port_attribute(
     switch_vlan_port_t switch_port;
     if(attr) {
         switch(attr->id) {
+            //case SAI_PORT_ATTR_PORT_VLAN_ID:
             case SAI_PORT_ATTR_DEFAULT_VLAN:
                 status = switch_api_vlan_id_to_handle_get((switch_vlan_t) attr->value.u16, &vlan_handle);
                 switch_port.handle = (switch_handle_t)port_id;

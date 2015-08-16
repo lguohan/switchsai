@@ -64,7 +64,10 @@ sai_status_t sai_create_hostif(
 
     SAI_LOG_EXIT(SAI_API_HOST_INTERFACE);
 
-    return SAI_STATUS_SUCCESS;
+    if(*hif_id == SWITCH_API_INVALID_HANDLE)
+        return SAI_STATUS_FAILURE;
+    else
+        return SAI_STATUS_SUCCESS;
 }
 
 /*
@@ -162,6 +165,7 @@ sai_status_t sai_create_hostif_trap_group(
     switch_hostif_group_t hostif_group;
     uint32_t index = 0;
     memset(&hostif_group, 0, sizeof(switch_hostif_group_t));
+    hostif_group.priority = 1000;
     for (index = 0; index < attr_count; index++) {
         attribute = &attr_list[index];   
         switch (attribute->id) {
@@ -421,6 +425,8 @@ sai_status_t sai_create_hostif_trap(
     uint32_t index = 0;
     memset(&rcode_api_info, 0, sizeof(switch_api_hostif_rcode_info_t));
     rcode_api_info.reason_code = switch_sai_to_switch_api_reason_code(hostif_trapid);
+    rcode_api_info.priority = 1000;
+    rcode_api_info.channel = SWITCH_HOSTIF_CHANNEL_NETDEV;
     for (index = 0; index < attr_count; index++) {
         attribute = &attr_list[index];
         switch (attribute->id) {
@@ -495,6 +501,8 @@ sai_status_t sai_set_hostif_trap_attribute(
     sai_status_t status = SAI_STATUS_SUCCESS;
     memset(&rcode_api_info, 0, sizeof(switch_api_hostif_rcode_info_t));
     rcode_api_info.reason_code = switch_sai_to_switch_api_reason_code(hostif_trapid);
+    rcode_api_info.channel = SWITCH_HOSTIF_CHANNEL_NETDEV;
+    rcode_api_info.priority = 1000;
     switch (attr->id) {
         case SAI_HOSTIF_TRAP_ATTR_PACKET_ACTION:
             rcode_api_info.action = switch_sai_action_to_switch_api_action(attr->value.u32);

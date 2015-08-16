@@ -24,6 +24,7 @@ limitations under the License.
 
 sai_api_service_t sai_api_service;
 switch_device_t device = 0;
+int log_level = P4_LOG_LEVEL_TRACE;
 
 #ifdef __cplusplus
 extern "C" {
@@ -157,6 +158,9 @@ sai_object_type_query(
         case SWITCH_HANDLE_TYPE_ACL:
             object_type = SAI_OBJECT_TYPE_ACL_TABLE;
             break;
+        case SWITCH_HANDLE_TYPE_HOSTIF:
+            object_type = SAI_OBJECT_TYPE_HOST_INTERFACE;
+            break;
         case SWITCH_HANDLE_TYPE_HOSTIF_GROUP:
             object_type = SAI_OBJECT_TYPE_TRAP_GROUP;
             break;
@@ -212,8 +216,26 @@ static unsigned int initialized = 0;
 extern int start_switch_api_packet_driver(void);
 static bmi_port_mgr_t *port_mgr;
 
+static void packet_log( int port_num, const char *buffer, int length)
+{
+    static char log_pkt[512];
+
+    /* @fixme log vector */
+    sprintf(log_pkt, "Packet in on port %d length %d; first bytes:\n", port_num, length);
+    int i = 0;
+    for (i = 0; i < 32; i++) {
+        if (i && ((i % 4) == 0)) {
+            sprintf(log_pkt, "%s ", log_pkt);
+        }
+        sprintf(log_pkt, "%s%02x", log_pkt, (uint8_t) buffer[i]);
+    }
+    if(log_level >= P4_LOG_LEVEL_TRACE)
+            printf("%s\n", log_pkt);
+}
+
 static void
 transmit_wrapper(p4_port_t egress, void *pkt, int len) {
+    packet_log(egress, pkt, len);
     if (bmi_port_send(port_mgr, egress, pkt, len) < 0) {
         printf("Error sending packet\n");
     }
@@ -236,6 +258,7 @@ packet_handler(int port_num, const char *buffer, int length)
     printf("\n");
     printf("rmt proc returns %d\n", rmt_process_pkt(port_num, (char*)buffer, length));
 #else
+    packet_log(port_num, buffer, length);
     rmt_process_pkt(port_num, (char*)buffer, length);
 #endif
 }
@@ -311,7 +334,7 @@ sai_api_initialize(
     _In_ const service_method_table_t* services) {
     sai_status_t status =  SAI_STATUS_SUCCESS;
     unsigned int num_ports = 32;
-    int log_level = P4_LOG_LEVEL_TRACE;
+    int log_level = P4_LOG_LEVEL_NONE;
     if(!initialized) {
         SAI_LOG(SAI_LOG_WARN, SAI_API_UNSPECIFIED, "INIT device");
         bmi_port_create_mgr(&port_mgr);
